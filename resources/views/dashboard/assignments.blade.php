@@ -1,0 +1,155 @@
+@extends('layouts.dashboard')
+
+@section('title', 'Penugasan & Penilaian - PT Pos Indonesia')
+
+@section('content')
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Penugasan & Penilaian</h1>
+            <p class="text-muted">Kelola tugas dan lihat penilaian dari pembimbing</p>
+        </div>
+    </div>
+
+    @if($assignments->count() > 0)
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks me-2"></i>Daftar Tugas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Deskripsi Tugas</th>
+                                    <th>Deadline</th>
+                                    <th>File Tugas</th>
+                                    <th>Status Pengumpulan</th>
+                                    <th>Nilai</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($assignments as $index => $assignment)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ Str::limit($assignment->description, 100) }}</strong>
+                                            <br>
+                                            <small class="text-muted">Dibuat: {{ $assignment->created_at->format('d M Y H:i') }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{ $assignment->deadline ? \Illuminate\Support\Carbon::parse($assignment->deadline)->format('d M Y') : '-' }}
+                                    </td>
+                                    <td>
+                                        @if($assignment->file_path)
+                                            <a href="{{ Storage::url($assignment->file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-download me-1"></i>Download
+                                            </a>
+                                        @else
+                                            <span class="text-muted">Tidak ada file</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="text-success"><i class="fas fa-check"></i> Sudah diberi tugas</span>
+                                    </td>
+                                    <td>
+                                        @if($assignment->grade !== null)
+                                            <span class="badge bg-info fs-6">{{ $assignment->grade }}/100</span>
+                                        @else
+                                            <span class="text-muted">Belum dinilai</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if(!$assignment->submitted_at)
+                                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#submitModal{{ $assignment->id }}">
+                                                <i class="fas fa-upload me-1"></i>Kumpulkan
+                                            </button>
+                                        @else
+                                            <span class="text-success">
+                                                <i class="fas fa-check-circle"></i> Selesai
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @else
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-tasks fa-4x text-muted mb-4"></i>
+                    @if(isset($application) && $application && $application->status == 'accepted')
+                        <h4 class="text-muted mb-3">Belum ada tugas yang diberikan oleh pembimbing.</h4>
+                        <p class="text-muted mb-4">Tunggu hingga pembimbing memberikan tugas pertama Anda.</p>
+                    @else
+                        <h4 class="text-muted mb-3">Belum Ada Tugas</h4>
+                        <p class="text-muted mb-4">Belum ada tugas yang diberikan oleh pembimbing. Tugas akan muncul di sini setelah Anda diterima magang.</p>
+                        <a href="{{ route('dashboard.status') }}" class="btn btn-primary">
+                            <i class="fas fa-clipboard-list me-2"></i>Lihat Status Pengajuan
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>
+
+<!-- Submit Assignment Modals -->
+@foreach($assignments as $assignment)
+@if(!$assignment->submitted_at)
+<div class="modal fade" id="submitModal{{ $assignment->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kumpulkan Tugas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('dashboard.assignments.submit', $assignment->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Deskripsi Tugas:</label>
+                        <p class="text-muted">{{ $assignment->description }}</p>
+                    </div>
+                    @if($assignment->online_text)
+                    <div class="mb-3">
+                        <label for="online_text_{{ $assignment->id }}" class="form-label">Online Text (opsional)</label>
+                        <textarea class="form-control" id="online_text_{{ $assignment->id }}" name="online_text" rows="3"></textarea>
+                    </div>
+                    @endif
+                    <div class="mb-3">
+                        <label for="submission_file" class="form-label">Upload File Tugas <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="submission_file" name="submission_file" accept=".pdf,.doc,.docx" required>
+                        <div class="form-text">Format yang diterima: PDF, DOC, DOCX (Maksimal 2MB)</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-1"></i>Kumpulkan Tugas
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+@endforeach
+@endsection 

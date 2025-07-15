@@ -1,0 +1,245 @@
+@extends('layouts.dashboard')
+
+@section('title', 'Status Pengajuan - PT Pos Indonesia')
+
+@section('content')
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Status Pengajuan Magang</h1>
+            <p class="text-muted">Informasi status pengajuan magang Anda</p>
+        </div>
+    </div>
+
+    @if($application)
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Application Status Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-file-alt me-2"></i>Detail Pengajuan
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Divisi:</strong></p>
+                                <p class="text-primary">{{ $application->divisi->name }}</p>
+                                
+                                <p class="mb-2"><strong>Sub Direktorat:</strong></p>
+                                <p>{{ $application->divisi->subDirektorat->name }}</p>
+                                
+                                <p class="mb-2"><strong>Direktorat:</strong></p>
+                                <p>{{ $application->divisi->subDirektorat->direktorat->name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2"><strong>Status:</strong></p>
+                                @if($application->status == 'pending')
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                @elseif($application->status == 'accepted')
+                                    <span class="badge bg-success">Diterima</span>
+                                @elseif($application->status == 'rejected')
+                                    <span class="badge bg-danger">Ditolak</span>
+                                @elseif($application->status == 'finished')
+                                    <span class="badge bg-primary">Finished</span>
+                                @endif
+                                
+                                <p class="mb-2 mt-3"><strong>Tanggal Pengajuan:</strong></p>
+                                <p>{{ $application->created_at->format('d M Y H:i') }}</p>
+                                
+                                @if($application->updated_at != $application->created_at)
+                                    <p class="mb-2"><strong>Terakhir Diupdate:</strong></p>
+                                    <p>{{ $application->updated_at->format('d M Y H:i') }}</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        @if($application->status == 'rejected' && $application->notes)
+                            <div class="mt-4 p-3 bg-light border-start border-danger border-4">
+                                <h6 class="text-danger mb-2">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Alasan Penolakan:
+                                </h6>
+                                <p class="mb-0">{{ $application->notes }}</p>
+                            </div>
+                        @endif
+
+                        @if($application->status == 'accepted')
+                            <div class="mt-4 p-3 bg-success bg-opacity-10 border-start border-success border-4">
+                                <h6 class="text-success mb-2">
+                                    <i class="fas fa-check-circle me-2"></i>Selamat! Pengajuan Anda Diterima
+                                </h6>
+                                <p class="mb-0">Tim HR akan menghubungi Anda segera untuk informasi selanjutnya.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Application Timeline -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-clock me-2"></i>Timeline Pengajuan
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-1">Pengajuan Dikirim</h6>
+                                    <p class="text-muted mb-0">{{ $application->created_at->format('d M Y H:i') }}</p>
+                                </div>
+                            </div>
+                            
+                            @if($application->status != 'pending')
+                                <div class="timeline-item">
+                                    <div class="timeline-marker {{ $application->status == 'accepted' ? 'bg-success' : ($application->status == 'rejected' ? 'bg-danger' : ($application->status == 'postponed' ? 'bg-secondary' : 'bg-primary')) }}"></div>
+                                    <div class="timeline-content">
+                                        <span class="small text-muted">{{ $application->updated_at->format('d M Y H:i') }}</span><br>
+                                        @if($application->status == 'accepted')
+                                            Pengajuan Diterima
+                                        @elseif($application->status == 'rejected')
+                                            Pengajuan Ditolak
+                                        @elseif($application->status == 'postponed')
+                                            Pengajuan Ditunda
+                                        @elseif($application->status == 'finished')
+                                            Pengajuan Diterima
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                            @if($application->status == 'finished')
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary"></div>
+                                    <div class="timeline-content">
+                                        <span class="small text-muted">{{ $application->updated_at->format('d M Y H:i') }}</span><br>
+                                        Kegiatan Magang sudah berakhir
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Action Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-tasks me-2"></i>Aksi
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        @if($application->status == 'rejected')
+                            <div class="d-grid gap-2">
+                                <a href="{{ route('dashboard.reapply') }}" class="btn btn-warning">
+                                    <i class="fas fa-paper-plane me-2"></i>Ajukan Ulang
+                                </a>
+                                <a href="{{ route('dashboard.program') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-building me-2"></i>Lihat Divisi Lain
+                                </a>
+                            </div>
+                        @elseif($application->status == 'accepted')
+                            <div class="d-grid gap-2">
+                                <a href="{{ route('dashboard.assignments') }}" class="btn btn-success">
+                                    <i class="fas fa-tasks me-2"></i>Lihat Tugas
+                                </a>
+                            </div>
+                        @elseif($application->status == 'finished')
+                            <div class="d-grid gap-2">
+                                <a href="{{ route('dashboard.certificates') }}" class="btn btn-primary">
+                                    <i class="fas fa-certificate me-2"></i>Lihat Sertifikat
+                                </a>
+                            </div>
+                        @else
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="text-muted">Menunggu review dari tim HR...</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-phone me-2"></i>Kontak HR
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong>Email:</strong></p>
+                        <p class="text-primary">hr@posindonesia.co.id</p>
+                        
+                        <p class="mb-2"><strong>Telepon:</strong></p>
+                        <p>(021) 789-0123</p>
+                        
+                        <p class="mb-2"><strong>Jam Kerja:</strong></p>
+                        <p>Senin - Jumat<br>08:00 - 17:00 WIB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @else
+        <!-- No Application Found -->
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted mb-3">Belum Ada Pengajuan</h4>
+                        <p class="text-muted mb-4">Anda belum mengajukan permintaan magang. Silakan ajukan permintaan magang terlebih dahulu.</p>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <a href="{{ route('dashboard.program') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Ajukan Permintaan Magang
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -22px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #e9ecef;
+}
+
+.timeline-content {
+    padding-left: 20px;
+}
+</style>
+@endsection 
