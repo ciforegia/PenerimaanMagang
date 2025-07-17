@@ -56,6 +56,7 @@ Route::middleware(['auth'])->prefix('mentor')->group(function () {
     Route::get('/penugasan', [MentorDashboardController::class, 'penugasan'])->name('mentor.penugasan');
     Route::post('/penugasan/tambah', [MentorDashboardController::class, 'tambahPenugasan'])->name('mentor.penugasan.tambah');
     Route::post('/penugasan/{assignment}/nilai', [MentorDashboardController::class, 'beriNilaiPenugasan'])->name('mentor.penugasan.nilai');
+    Route::post('/penugasan/{assignment}/revisi', [MentorDashboardController::class, 'setRevisiPenugasan'])->name('mentor.penugasan.revisi');
     // Menu sertifikat
     Route::get('/sertifikat', [MentorDashboardController::class, 'sertifikat'])->name('mentor.sertifikat');
     Route::post('/sertifikat/{user}/upload', [MentorDashboardController::class, 'uploadSertifikat'])->name('mentor.sertifikat.upload');

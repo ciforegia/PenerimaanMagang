@@ -9,7 +9,39 @@ class MentorDashboardController extends Controller
 {
     public function index()
     {
-        return view('mentor.dashboard');
+        $user = Auth::user();
+        $divisi = $user->divisi;
+        $pendingApplications = $divisi
+            ? $divisi->internshipApplications()->where('status', 'pending')->count()
+            : 0;
+        $activeParticipants = $divisi
+            ? $divisi->internshipApplications()
+                ->where('status', 'accepted')
+                ->where(function($q) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+                })
+                ->count()
+            : 0;
+        $assignmentsToGrade = $divisi
+            ? \App\Models\Assignment::whereHas('user.internshipApplications', function($q) use ($divisi) {
+                $q->where('divisi_id', $divisi->id)->where('status', 'accepted');
+            })->whereNotNull('submission_file_path')->whereNull('grade')->count()
+            : 0;
+        $pengajuanBaru = $divisi
+            ? $divisi->internshipApplications()->where('status', 'pending')->count()
+            : 0;
+        $tugasBaruDiupload = $divisi
+            ? \App\Models\Assignment::whereHas('user.internshipApplications', function($q) use ($divisi) {
+                $q->where('divisi_id', $divisi->id)->where('status', 'accepted');
+            })->whereNotNull('submission_file_path')->whereNull('grade')->count()
+            : 0;
+        return view('mentor.dashboard', [
+            'pendingApplications' => $pendingApplications,
+            'activeParticipants' => $activeParticipants,
+            'assignmentsToGrade' => $assignmentsToGrade,
+            'pengajuanBaru' => $pengajuanBaru,
+            'tugasBaruDiupload' => $tugasBaruDiupload,
+        ]);
     }
 
     public function pengajuan()
@@ -61,8 +93,9 @@ class MentorDashboardController extends Controller
             $assignments = $p->user->assignments;
             $isEndDatePassed = $p->end_date && now()->isAfter($p->end_date);
             $allAssignmentsGraded = $assignments->count() > 0 && $assignments->every(fn($a) => $a->grade !== null);
-            
-            // Status selesai hanya jika end_date sudah lewat
+            $noRevision = $assignments->count() > 0 && $assignments->every(fn($a) => $a->is_revision !== 1);
+            // Syarat upload: semua tugas dinilai/feedback dan tidak ada tugas status revisi
+            $p->can_upload_certificate = $allAssignmentsGraded && $noRevision;
             $p->is_completed = $isEndDatePassed;
             $p->all_assignments_graded = $allAssignmentsGraded;
             return $p;
@@ -140,18 +173,45 @@ class MentorDashboardController extends Controller
 
     public function beriNilaiPenugasan(Request $request, $assignmentId)
     {
-        $request->validate([
-            'grade' => 'required|numeric|min:0|max:100',
-        ]);
         $assignment = \App\Models\Assignment::findOrFail($assignmentId);
-        // Pastikan hanya pembimbing divisi terkait yang bisa menilai
         $user = Auth::user();
         if (!$assignment->user || $assignment->user->divisi_id !== $user->divisi_id) {
             abort(403);
         }
-        $assignment->grade = $request->grade;
+        // Jika revisi diizinkan, hanya feedback yang bisa diinput
+        if ($assignment->is_revision === 1) {
+            $request->validate([
+                'feedback' => 'required|string',
+            ]);
+            $assignment->feedback = $request->feedback;
+            // Nilai tidak diubah
+        } else {
+            $request->validate([
+                'grade' => 'required|numeric|min:0|max:100',
+                'feedback' => 'nullable|string',
+            ]);
+            $assignment->grade = $request->grade;
+            $assignment->feedback = $request->feedback;
+        }
         $assignment->save();
-        return redirect()->route('mentor.penugasan')->with('success', 'Nilai tugas berhasil disimpan.');
+        return redirect()->route('mentor.penugasan')
+            ->with('success', 'Penilaian tugas berhasil disimpan.')
+            ->with('feedback_saved_assignment_id', $assignment->id);
+    }
+
+    public function setRevisiPenugasan(Request $request, $assignmentId)
+    {
+        $request->validate([
+            'is_revision' => 'required|in:0,1',
+        ]);
+        $assignment = \App\Models\Assignment::findOrFail($assignmentId);
+        $user = Auth::user();
+        if (!$assignment->user || $assignment->user->divisi_id !== $user->divisi_id) {
+            abort(403);
+        }
+        $assignment->is_revision = $request->is_revision;
+        $assignment->save();
+        return redirect()->route('mentor.penugasan')->with('success', 'Status revisi tugas berhasil diperbarui.');
     }
 
     public function uploadSertifikat(Request $request, $userId)

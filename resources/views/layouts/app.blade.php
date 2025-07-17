@@ -51,6 +51,17 @@
         .navbar-nav .nav-link.active, .navbar-nav .nav-link:focus, .navbar-nav .nav-link:hover {
             color: #e74c3c !important;
         }
+        
+        .dropdown-menu .btn-logout {
+            background-color: #dc3545 !important;
+            color: #fff !important;
+            width: 100%;
+            text-align: left;
+        }
+        .dropdown-menu .btn-logout:hover {
+            background-color: #b52a37 !important;
+            color: #fff !important;
+        }
     </style>
     
     @yield('styles')
@@ -98,7 +109,7 @@
                                 <li>
                                     <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">Logout</button>
+                                        <button type="submit" class="dropdown-item btn-logout">Logout</button>
                                     </form>
                                 </li>
                             </ul>

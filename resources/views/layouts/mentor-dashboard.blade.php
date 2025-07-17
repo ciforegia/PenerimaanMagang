@@ -11,19 +11,19 @@
     <style>
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
+            background: linear-gradient(135deg, #e3ecfa 0%, #b6c9e6 100%);
+            color: #223366;
         }
         .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
+            color: #223366;
             padding: 0.75rem 1rem;
             border-radius: 0.375rem;
             margin: 0.25rem 0;
         }
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
+            color:rgb(0, 213, 246);
+            background-color: #dde6f7;
         }
         .sidebar .nav-link i {
             width: 20px;
@@ -43,9 +43,7 @@
         <div class="col-md-3 col-lg-2 px-0">
             <div class="sidebar p-3">
                 <div class="text-center mb-4">
-                    <i class="fas fa-user-tie fa-2x mb-2"></i>
-                    <h5>Pembimbing Lapangan</h5>
-                    <small class="text-muted">Sistem Penerimaan Magang</small>
+                    <img src="/image/PosInd_Logo.png" alt="Logo PT Pos Indonesia" style="height:90px; margin-bottom:10px;">
                 </div>
                 <div class="mb-4">
                     <h6 class="text-muted mb-2">Welcome</h6>
@@ -69,7 +67,7 @@
                 <hr class="my-3">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="btn btn-outline-light btn-sm w-100">
+                    <button type="submit" class="btn btn-danger btn-sm w-100">
                         <i class="fas fa-sign-out-alt me-2"></i>Logout
                     </button>
                 </form>
@@ -123,6 +121,19 @@
 </div>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            document.querySelectorAll('.alert-dismissible').forEach(function(alert) {
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            });
+        }, 3000);
+    });
+</script>
 @yield('scripts')
 </body>
 </html>

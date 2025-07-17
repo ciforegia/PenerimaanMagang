@@ -15,6 +15,48 @@
         </div>
     </div>
 
+    <!-- Notifikasi -->
+    @php
+        $tugasBaru = $user->assignments->where('submitted_at', null)->count();
+        $tugasDinilai = $user->assignments->where('grade', '!=', null)->where('updated_at', '>=', Auth::user()->updated_at)->count();
+        $latestApp = $user->internshipApplications->whereIn('status', ['accepted', 'finished'])->sortByDesc('end_date')->first();
+        $isEndDatePassed = $latestApp && $latestApp->end_date && now()->isAfter($latestApp->end_date);
+        $jumlahSertifikat = $isEndDatePassed ? $user->certificates->count() : 0;
+        $revisiBaru = $user->assignments->where('is_revision', 1)->where('feedback', '!=', null)->count();
+    @endphp
+    @if($tugasBaru > 0)
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-tasks me-2"></i>
+            <strong>{{ $tugasBaru }} tugas baru</strong> menunggu untuk dikerjakan!
+            <a href="{{ route('dashboard.assignments') }}" class="alert-link">Lihat Tugas</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+    @if($tugasDinilai > 0)
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>{{ $tugasDinilai }} tugas Anda sudah dinilai!</strong>
+            <a href="{{ route('dashboard.assignments') }}" class="alert-link">Lihat Nilai</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+    @if($jumlahSertifikat > 0)
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            <i class="fas fa-certificate me-2"></i>
+            <strong>Selamat!</strong> Anda mendapatkan {{ $jumlahSertifikat }} sertifikat baru.
+            <a href="{{ route('dashboard.certificates') }}" class="alert-link">Lihat Sertifikat</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+    @if($revisiBaru > 0)
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-undo me-2"></i>
+            Anda mendapat <strong>revisi tugas</strong> dari pembimbing pada {{ $revisiBaru }} tugas. Silakan cek feedback dan kumpulkan ulang tugas Anda!
+            <a href="{{ route('dashboard.assignments') }}" class="alert-link">Lihat Feedback</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <!-- User Info Card -->
     <div class="row mb-4">
         <div class="col-12">
@@ -136,7 +178,7 @@
             <div class="card bg-info text-white">
                 <div class="card-body text-center">
                     <i class="fas fa-certificate fa-2x mb-2"></i>
-                    <h4 class="mb-0">{{ $user->certificates->count() ?? 0 }}</h4>
+                    <h4 class="mb-0">{{ $jumlahSertifikat }}</h4>
                     <small>Sertifikat</small>
                 </div>
             </div>

@@ -24,19 +24,19 @@ use Carbon\Carbon;
                             <table class="table table-bordered table-hover">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama Pembimbing</th>
-                                        <th>Divisi</th>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th>Pengajuan Pending</th>
-                                        <th>Pengajuan Diterima</th>
-                                        <th>Peserta Magang</th>
-                                        <th>Nama Peserta</th>
-                                        <th>Judul Tugas</th>
-                                        <th>Status</th>
-                                        <th>Sertifikat</th>
-                                        <th>Aksi</th>
+                                        <th class="align-middle text-center">No</th>
+                                        <th class="align-middle text-center" style="min-width: 180px;">Nama Pembimbing</th>
+                                        <th class="align-middle text-center">Divisi</th>
+                                        <th class="align-middle text-center">Username</th>
+                                        <th class="align-middle text-center">Email</th>
+                                        <th class="align-middle text-center">Pengajuan Pending</th>
+                                        <th class="align-middle text-center">Pengajuan Diterima</th>
+                                        <th class="align-middle text-center">Peserta Magang</th>
+                                        <th class="align-middle text-center">Nama Peserta</th>
+                                        <th class="align-middle text-center">Judul Tugas</th>
+                                        <th class="align-middle text-center" style="min-width: 120px;">Status</th>
+                                        <th class="align-middle text-center">Sertifikat</th>
+                                        <th class="align-middle text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -56,70 +56,86 @@ use Carbon\Carbon;
                                         @foreach($participants as $participantIndex => $participant)
                                         <tr>
                                             @if($participantIndex == 0)
-                                                <td rowspan="{{ $rowspan }}">{{ $rowNumber++ }}</td>
-                                                <td rowspan="{{ $rowspan }}">
-                                                    <strong>{{ $mentor->name }}</strong>
+                                                <td rowspan="{{ $rowspan }}" class="align-middle text-start">{{ $rowNumber++ }}</td>
+                                                <td style="min-width: 180px;" rowspan="{{ $rowspan }}" class="align-middle text-start">
+                                                    <strong>{{ $mentor->divisi->pic_name ?? '-' }}</strong>
                                                     @if($mentor->divisi)
                                                         <br><small class="text-muted">{{ $mentor->divisi->subDirektorat->direktorat->name ?? '' }}</small>
                                                     @endif
                                                 </td>
-                                                <td rowspan="{{ $rowspan }}">
+                                                <td rowspan="{{ $rowspan }}" class="align-middle text-start">
                                                     @if($mentor->divisi)
                                                         <span class="badge bg-info">{{ $mentor->divisi->name }}</span>
                                                     @else
                                                         <span class="badge bg-warning">Tidak ada divisi</span>
                                                     @endif
                                                 </td>
-                                                <td rowspan="{{ $rowspan }}">
+                                                <td rowspan="{{ $rowspan }}" class="align-middle text-start">
                                                     <span class="badge bg-primary">{{ $mentor->username }}</span>
                                                 </td>
-                                                <td rowspan="{{ $rowspan }}">{{ $mentor->email }}</td>
-                                                <td rowspan="{{ $rowspan }}">
+                                                <td rowspan="{{ $rowspan }}" class="align-middle text-start">{{ $mentor->email }}</td>
+                                                <td rowspan="{{ $rowspan }}" class="align-middle text-start">
                                                     <span class="badge bg-warning">{{ $pendingCount }}</span>
                                                 </td>
-                                                <td rowspan="{{ $rowspan }}">
+                                                <td rowspan="{{ $rowspan }}" class="align-middle text-start">
                                                     <span class="badge bg-info">{{ $acceptedCount }}</span>
                                                 </td>
-                                                <td rowspan="{{ $rowspan }}">
+                                                <td rowspan="{{ $rowspan }}" class="align-middle text-start">
                                                     <span class="badge bg-success">{{ $participantCount }}</span>
                                                 </td>
                                             @endif
-                                            <td>
+                                            <td class="align-middle text-center">
                                                 <strong>{{ $participant->user->name }}</strong>
                                                 <br><small class="text-muted">{{ $participant->user->nim ?? '-' }}</small>
                                             </td>
-                                            <td>
-                                                @if($participant->user->assignments->count() > 0)
-                                                    @foreach($participant->user->assignments as $assignment)
-                                                        <div class="mb-1">
-                                                            <small class="fw-bold">{{ $assignment->title }}</small>
-                                                            @if($assignment->deadline)
-                                                                <br><small class="text-muted">Deadline: {{ Carbon::parse($assignment->deadline)->format('d/m/Y') }}</small>
+                                            <td class="align-middle text-start p-0">
+                                                <div class="d-flex flex-column h-100 justify-content-between">
+                                                    @if($participant->user->assignments->count() > 0)
+                                                        @foreach($participant->user->assignments as $i => $assignment)
+                                                            <div class="py-2 px-2">
+                                                                <small class="fw-bold">{{ $assignment->title }}</small>
+                                                                @if($assignment->deadline)
+                                                                    <br><small class="text-muted">Deadline: {{ Carbon::parse($assignment->deadline)->format('d/m/Y') }}</small>
+                                                                @endif
+                                                            </div>
+                                                            @if($i < $participant->user->assignments->count() - 1)
+                                                                <div style="border-bottom:1px solid #dee2e6; margin:0 8px;"></div>
                                                             @endif
-                                                        </div>
-                                                    @endforeach
-                                                @else
-                                                    <span class="text-muted">Belum ada tugas</span>
-                                                @endif
+                                                        @endforeach
+                                                    @else
+                                                        <span class="text-muted px-2">Belum ada tugas</span>
+                                                    @endif
+                                                </div>
                                             </td>
-                                            <td>
-                                                @if($participant->user->assignments->count() > 0)
-                                                    @foreach($participant->user->assignments as $assignment)
-                                                        <div class="mb-2">
-                                                            <span class="text-success"><i class="fas fa-check"></i> Sudah diberi tugas</span>
-                                                            <br>
-                                                            @if($assignment->grade !== null)
-                                                                <span class="text-success"><i class="fas fa-star"></i> Nilai: {{ $assignment->grade }}/100</span>
-                                                            @else
-                                                                <span class="text-warning"><i class="fas fa-clock"></i> Belum dinilai</span>
+                                            <td style="min-width: 120px;" class="align-middle text-start p-0">
+                                                <div class="d-flex flex-column h-100 justify-content-between">
+                                                    @if($participant->user->assignments->count() > 0)
+                                                        @foreach($participant->user->assignments as $i => $assignment)
+                                                            <div class="py-2 px-2">
+                                                                @if($assignment->is_revision == 1)
+                                                                    <span class="text-warning"><i class="fas fa-edit"></i> Sedang Revisi</span>
+                                                                @elseif($assignment->submitted_at)
+                                                                    <span class="text-success"><i class="fas fa-check"></i> Sudah Dikumpulkan</span>
+                                                                @else
+                                                                    <span class="text-danger"><i class="fas fa-times"></i> Belum Dikumpulkan</span>
+                                                                @endif
+                                                                <br>
+                                                                @if($assignment->grade !== null)
+                                                                    <span class="text-success"><i class="fas fa-star"></i> Nilai: {{ $assignment->grade }}/100</span>
+                                                                @else
+                                                                    <span class="text-warning"><i class="fas fa-clock"></i> Belum dinilai</span>
+                                                                @endif
+                                                            </div>
+                                                            @if($i < $participant->user->assignments->count() - 1)
+                                                                <div style="border-bottom:1px solid #dee2e6; margin:0 8px;"></div>
                                                             @endif
-                                                        </div>
-                                                    @endforeach
-                                                @else
-                                                    <i class="fas fa-times text-danger" title="Tidak ada tugas"></i>
-                                                @endif
+                                                        @endforeach
+                                                    @else
+                                                        <span class="text-muted px-2">-</span>
+                                                    @endif
+                                                </div>
                                             </td>
-                                            <td>
+                                            <td class="align-middle text-center">
                                                 @if($participant->user->certificates->count() > 0)
                                                     <i class="fas fa-check text-success" title="Ada sertifikat"></i>
                                                 @else
@@ -127,7 +143,7 @@ use Carbon\Carbon;
                                                 @endif
                                             </td>
                                             @if($participantIndex == 0)
-                                                <td rowspan="{{ $rowspan }}">
+                                                <td rowspan="{{ $rowspan }}" class="align-middle text-start">
                                                     <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ $mentor->id }}">
                                                         <i class="fas fa-key me-1"></i>Reset Password
                                                     </button>
@@ -137,22 +153,22 @@ use Carbon\Carbon;
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td>{{ $rowNumber++ }}</td>
-                                            <td><strong>{{ $mentor->name }}</strong></td>
-                                            <td>
+                                            <td class="align-middle text-start">{{ $rowNumber++ }}</td>
+                                            <td class="align-middle text-start"><strong>{{ $mentor->divisi->pic_name ?? '-' }}</strong></td>
+                                            <td class="align-middle text-start">
                                                 @if($mentor->divisi)
                                                     <span class="badge bg-info">{{ $mentor->divisi->name }}</span>
                                                 @else
                                                     <span class="badge bg-warning">Tidak ada divisi</span>
                                                 @endif
                                             </td>
-                                            <td><span class="badge bg-primary">{{ $mentor->username }}</span></td>
-                                            <td>{{ $mentor->email }}</td>
-                                            <td><span class="badge bg-warning">{{ $pendingCount }}</span></td>
-                                            <td><span class="badge bg-info">{{ $acceptedCount }}</span></td>
-                                            <td><span class="badge bg-success">0</span></td>
-                                            <td class="text-center text-muted" colspan="4">Tidak ada peserta magang aktif</td>
-                                            <td>
+                                            <td class="align-middle text-start"><span class="badge bg-primary">{{ $mentor->username }}</span></td>
+                                            <td class="align-middle text-start">{{ $mentor->email }}</td>
+                                            <td class="align-middle text-start"><span class="badge bg-warning">{{ $pendingCount }}</span></td>
+                                            <td class="align-middle text-start"><span class="badge bg-info">{{ $acceptedCount }}</span></td>
+                                            <td class="align-middle text-start"><span class="badge bg-success">0</span></td>
+                                            <td class="text-center text-muted align-middle" colspan="4">Tidak ada peserta magang aktif</td>
+                                            <td class="align-middle text-start">
                                                 <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ $mentor->id }}">
                                                     <i class="fas fa-key me-1"></i>Reset Password
                                                 </button>

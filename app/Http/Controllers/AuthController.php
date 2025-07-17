@@ -65,7 +65,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'username' => 'required|unique:users,username',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:6|confirmed|different:username',
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'nim' => 'required',
@@ -77,6 +77,8 @@ class AuthController extends Controller
             'cover_letter' => 'required|file|mimes:pdf|max:2048',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+        ], [
+            'password.different' => 'Password tidak boleh sama dengan username.'
         ]);
 
         // Create user

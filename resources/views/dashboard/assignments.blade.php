@@ -32,13 +32,15 @@
                                     <th>File Tugas</th>
                                     <th>Status Pengumpulan</th>
                                     <th>Nilai</th>
+                                    <th>Feedback</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($assignments as $index => $assignment)
+                                @php $no = 1; @endphp
+                                @foreach($assignments->sortBy('created_at') as $assignment)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $no++ }}</td>
                                     <td>
                                         <div>
                                             <strong>{{ Str::limit($assignment->description, 100) }}</strong>
@@ -59,7 +61,21 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="text-success"><i class="fas fa-check"></i> Sudah diberi tugas</span>
+                                        @php
+                                            $showBelumKumpul = false;
+                                            if ($assignment->is_revision === 1) {
+                                                // Cek apakah submission terakhir dibuat sebelum status revisi diberikan
+                                                $lastSubmission = $assignment->submissions ? $assignment->submissions->sortByDesc('submitted_at')->first() : null;
+                                                if (!$lastSubmission || ($assignment->updated_at && $lastSubmission->submitted_at < $assignment->updated_at)) {
+                                                    $showBelumKumpul = true;
+                                                }
+                                            }
+                                        @endphp
+                                        @if($showBelumKumpul)
+                                            <span class="text-danger"><i class="fas fa-times"></i> Belum dikumpulkan (Revisi)</span>
+                                        @else
+                                            <span class="text-success"><i class="fas fa-check"></i> Sudah dikumpulkan</span>
+                                        @endif
                                     </td>
                                     <td>
                                         @if($assignment->grade !== null)
@@ -69,9 +85,12 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if(!$assignment->submitted_at)
+                                        {{ $assignment->feedback ?? '-' }}
+                                    </td>
+                                    <td>
+                                        @if(!$assignment->submitted_at || $assignment->is_revision === 1)
                                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#submitModal{{ $assignment->id }}">
-                                                <i class="fas fa-upload me-1"></i>Kumpulkan
+                                                <i class="fas fa-upload me-1"></i>{{ !$assignment->submitted_at ? 'Kumpulkan' : 'Kumpulkan Ulang' }}
                                             </button>
                                         @else
                                             <span class="text-success">
@@ -113,12 +132,12 @@
 
 <!-- Submit Assignment Modals -->
 @foreach($assignments as $assignment)
-@if(!$assignment->submitted_at)
+@if(!$assignment->submitted_at || $assignment->is_revision === 1)
 <div class="modal fade" id="submitModal{{ $assignment->id }}" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Kumpulkan Tugas</h5>
+                <h5 class="modal-title">{{ !$assignment->submitted_at ? 'Kumpulkan Tugas' : 'Kumpulkan Ulang Tugas (Revisi)' }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ route('dashboard.assignments.submit', $assignment->id) }}" method="POST" enctype="multipart/form-data">
@@ -143,7 +162,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-upload me-1"></i>Kumpulkan Tugas
+                        <i class="fas fa-upload me-1"></i>{{ !$assignment->submitted_at ? 'Kumpulkan Tugas' : 'Kumpulkan Ulang' }}
                     </button>
                 </div>
             </form>

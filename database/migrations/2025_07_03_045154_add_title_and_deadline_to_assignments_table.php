@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::table('assignments', function (Blueprint $table) {
             $table->string('title')->nullable();
             $table->date('deadline')->nullable();
+            $table->boolean('is_revision')->nullable()->after('grade');
+            $table->text('feedback')->nullable()->after('is_revision');
         });
     }
 
@@ -23,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('assignments', function (Blueprint $table) {
-            $table->dropColumn(['title', 'deadline']);
+            $table->dropColumn(['title', 'deadline', 'is_revision', 'feedback']);
         });
     }
 };

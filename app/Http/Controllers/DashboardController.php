@@ -8,6 +8,7 @@ use App\Models\Divisi;
 use App\Models\InternshipApplication;
 use App\Models\Assignment;
 use App\Models\Certificate;
+use App\Models\AssignmentSubmission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -112,12 +113,26 @@ class DashboardController extends Controller
             'submitted_at' => now(),
         ];
         if ($request->hasFile('submission_file')) {
-            $data['submission_file_path'] = $request->file('submission_file')->store('assignments', 'public');
+            $filePath = $request->file('submission_file')->store('assignments', 'public');
+            $data['submission_file_path'] = $filePath;
+            // Simpan ke tabel assignment_submissions
+            AssignmentSubmission::create([
+                'assignment_id' => $assignment->id,
+                'user_id' => Auth::id(),
+                'file_path' => $filePath,
+                'submitted_at' => now(),
+                'keterangan' => 'Kumpul tugas' . ($assignment->submissions()->count() > 0 ? ' (Revisi)' : ''),
+            ]);
         }
         if ($request->filled('online_text')) {
             $data['online_text'] = $request->online_text;
         }
         $assignment->update($data);
+        // Jika assignment sebelumnya status revisi, reset is_revision setelah submit revisi
+        if ($assignment->is_revision === 1) {
+            $assignment->is_revision = null;
+            $assignment->save();
+        }
 
         return back()->with('success', 'Tugas berhasil dikumpulkan!');
     }
@@ -128,8 +143,11 @@ class DashboardController extends Controller
     public function certificates()
     {
         $user = Auth::user();
-        $certificates = $user->certificates()->orderBy('created_at', 'desc')->get();
-        
+        $certificates = collect();
+        $latestApp = $user->internshipApplications()->whereIn('status', ['accepted', 'finished'])->latest()->first();
+        if ($latestApp && $latestApp->end_date && now()->isAfter($latestApp->end_date)) {
+            $certificates = $user->certificates()->orderBy('created_at', 'desc')->get();
+        }
         return view('dashboard.certificates', compact('user', 'certificates'));
     }
 

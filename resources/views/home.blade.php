@@ -33,41 +33,36 @@
 <!-- About Company Section -->
 <section class="py-5">
     <div class="container">
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center">
-                <h2 class="mb-4">Tentang PT Pos Indonesia</h2>
-                <p class="lead text-muted">
-                    PT Pos Indonesia adalah perusahaan pos terbesar di Indonesia yang telah melayani masyarakat sejak tahun 1746. 
-                    Kami berkomitmen untuk memberikan layanan pos yang terpercaya dan inovatif untuk seluruh Indonesia.
-                </p>
-            </div>
-        </div>
-        
-        <div class="row mt-5">
-            <div class="col-md-4 text-center mb-4">
-                <div class="card border-0 shadow-sm h-100 card-hover">
-                    <div class="card-body">
-                        <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Layanan Kurir</h5>
-                        <p class="card-text">Layanan kurir cepat dan terpercaya ke seluruh Indonesia dengan jaringan yang luas.</p>
+        <h2 class="text-center mb-4">Prosedur Pengajuan Magang</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-9">
+                <div class="row g-4">
+                    <div class="col-md-4 col-12 text-center">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="mb-3"><i class="fas fa-user-plus fa-2x text-primary"></i></div>
+                                <h6 class="fw-bold">1. Registrasi & Ajukan Magang</h6>
+                                <p class="text-muted small">Buat akun, lengkapi data, dan upload surat pengantar serta dokumen pengajuan magang.</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4 text-center mb-4">
-                <div class="card border-0 shadow-sm h-100 card-hover">
-                    <div class="card-body">
-                        <i class="fas fa-university fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Layanan Keuangan</h5>
-                        <p class="card-text">Berbagai layanan keuangan seperti transfer, pembayaran, dan tabungan untuk masyarakat.</p>
+                    <div class="col-md-4 col-12 text-center">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="mb-3"><i class="fas fa-sign-in-alt fa-2x text-primary"></i></div>
+                                <h6 class="fw-bold">2. Login</h6>
+                                <p class="text-muted small">Masuk ke sistem menggunakan akun yang sudah didaftarkan.</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4 text-center mb-4">
-                <div class="card border-0 shadow-sm h-100 card-hover">
-                    <div class="card-body">
-                        <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Digital Services</h5>
-                        <p class="card-text">Layanan digital modern untuk memudahkan akses masyarakat ke layanan kami.</p>
+                    <div class="col-md-4 col-12 text-center">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="mb-3"><i class="fas fa-hourglass-half fa-2x text-primary"></i></div>
+                                <h6 class="fw-bold">3. Menunggu Verifikasi</h6>
+                                <p class="text-muted small">Tunggu proses verifikasi dan persetujuan dari admin/mentor.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

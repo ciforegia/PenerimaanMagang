@@ -48,12 +48,8 @@
                             </td>
                             <td>
                                 @php
-                                    $isEndDatePassed = $p->end_date && now()->isAfter($p->end_date);
-                                    $assignments = $p->user->assignments;
-                                    $allAssignmentsGraded = $assignments->count() > 0 && $assignments->every(fn($a) => $a->grade !== null);
-                                    $canUploadCertificate = ($p->status === 'finished' || $isEndDatePassed);
+                                    $canUploadCertificate = $p->can_upload_certificate;
                                 @endphp
-                                
                                 @if($canUploadCertificate)
                                     @if($p->user->certificates->count() > 0)
                                         <a href="{{ asset('storage/' . $p->user->certificates->first()->certificate_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Preview Sertifikat</a>
@@ -65,7 +61,7 @@
                                         </form>
                                     @endif
                                 @else
-                                    <span class="text-muted">Belum selesai magang</span>
+                                    <span class="text-muted">Upload sertifikat hanya bisa dilakukan jika semua tugas sudah dinilai dan tidak ada tugas status revisi.</span>
                                 @endif
                             </td>
                         </tr>
