@@ -17,14 +17,17 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Peserta</th>
+                            <th>KTM</th>
                             <th>Email</th>
                             <th>No HP</th>
                             <th>Divisi</th>
                             <th>Judul Tugas</th>
                             <th>Status Tugas</th>
                             <th>Sertifikat</th>
+                            <th>Persyaratan Tambahan</th>
                             <th>Start Date</th>
                             <th>End Date</th>
+                            <th>Surat Penerimaan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,6 +37,13 @@
                                 <tr>
                                     <td class="align-middle text-start">{{ $row++ }}</td>
                                     <td class="align-middle text-start">{{ $peserta->name }}</td>
+                                    <td class="align-middle text-center">
+                                        @if($peserta->ktm)
+                                            <a href="{{ asset('storage/' . $peserta->ktm) }}" target="_blank" class="btn btn-sm btn-outline-primary">Lihat KTM</a>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                     <td class="align-middle text-start">{{ $peserta->email ?? '-' }}</td>
                                     <td class="align-middle text-start">{{ $peserta->phone ?? '-' }}</td>
                                     <td class="align-middle text-start">{{ $app->divisi->name ?? '-' }}</td>
@@ -81,8 +91,43 @@
                                             <span class="text-danger"><i class="fas fa-times-circle"></i></span>
                                         @endif
                                     </td>
+                                    <td class="align-middle text-start">
+                                        <ul class="mb-0" style="list-style: none; padding-left: 0;">
+                                            @if($app->cover_letter_path)
+                                                <li><a href="{{ asset('storage/' . $app->cover_letter_path) }}" target="_blank">Surat Pengantar Kampus</a></li>
+                                            @endif
+                                            @if($app->foto_nametag_path)
+                                                <li><a href="{{ asset('storage/' . $app->foto_nametag_path) }}" target="_blank">Foto Name Tag</a></li>
+                                            @endif
+                                            @if($app->screenshot_pospay_path)
+                                                <li><a href="{{ asset('storage/' . $app->screenshot_pospay_path) }}" target="_blank">Screenshot aplikasi PosPay</a></li>
+                                            @endif
+                                            @if($app->foto_prangko_prisma_path)
+                                                <li><a href="{{ asset('storage/' . $app->foto_prangko_prisma_path) }}" target="_blank">Foto Prangko Prisma</a></li>
+                                            @endif
+                                            @if($app->ss_follow_ig_museum_path)
+                                                <li><a href="{{ asset('storage/' . $app->ss_follow_ig_museum_path) }}" target="_blank">Screenshot follow IG museumposindonesia</a></li>
+                                            @endif
+                                            @if($app->ss_follow_ig_posindonesia_path)
+                                                <li><a href="{{ asset('storage/' . $app->ss_follow_ig_posindonesia_path) }}" target="_blank">Screenshot follow IG posindonesia.ig</a></li>
+                                            @endif
+                                            @if($app->ss_subscribe_youtube_path)
+                                                <li><a href="{{ asset('storage/' . $app->ss_subscribe_youtube_path) }}" target="_blank">Screenshot subscribe Youtube</a></li>
+                                            @endif
+                                            @if(!$app->cover_letter_path && !$app->foto_nametag_path && !$app->screenshot_pospay_path && !$app->foto_prangko_prisma_path && !$app->ss_follow_ig_museum_path && !$app->ss_follow_ig_posindonesia_path && !$app->ss_subscribe_youtube_path)
+                                                <li><span class="text-muted">-</span></li>
+                                            @endif
+                                        </ul>
+                                    </td>
                                     <td class="align-middle text-start">{{ $app->start_date ? \Carbon\Carbon::parse($app->start_date)->format('d-m-Y') : '-' }}</td>
                                     <td class="align-middle text-start">{{ $app->end_date ? \Carbon\Carbon::parse($app->end_date)->format('d-m-Y') : '-' }}</td>
+                                    <td class="align-middle text-center">
+                                        @if($app->acceptance_letter_path)
+                                            <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                                        @else
+                                            <span class="text-danger"><i class="fas fa-times-circle"></i></span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         @endforeach

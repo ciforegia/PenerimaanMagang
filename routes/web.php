@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
     // Dashboard routes
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/status', [DashboardController::class, 'status'])->name('dashboard.status');
+    Route::post('/dashboard/status/acknowledge', [DashboardController::class, 'acknowledgePersyaratanTambahan'])->name('dashboard.status.acknowledge');
+    Route::post('/dashboard/status/upload-additional', [DashboardController::class, 'submitAdditionalDocuments'])->name('dashboard.status.upload-additional');
     Route::get('/dashboard/assignments', [DashboardController::class, 'assignments'])->name('dashboard.assignments');
     Route::post('/dashboard/assignments/{id}/submit', [DashboardController::class, 'submitAssignment'])->name('dashboard.assignments.submit');
     Route::get('/dashboard/certificates', [DashboardController::class, 'certificates'])->name('dashboard.certificates');
@@ -52,6 +54,10 @@ Route::middleware(['auth'])->prefix('mentor')->group(function () {
     // Menu pengajuan magang
     Route::get('/pengajuan', [MentorDashboardController::class, 'pengajuan'])->name('mentor.pengajuan');
     Route::post('/pengajuan/{id}/respon', [MentorDashboardController::class, 'responPengajuan'])->name('mentor.pengajuan.respon');
+    // Surat Penerimaan
+    Route::get('/pengajuan/{id}/acceptance-letter', [MentorDashboardController::class, 'showAcceptanceLetterForm'])->name('mentor.pengajuan.acceptance-letter.form');
+    Route::post('/pengajuan/{id}/acceptance-letter/preview', [MentorDashboardController::class, 'previewAcceptanceLetter'])->name('mentor.pengajuan.acceptance-letter.preview');
+    Route::post('/pengajuan/{id}/acceptance-letter/send', [MentorDashboardController::class, 'sendAcceptanceLetter'])->name('mentor.pengajuan.acceptance-letter.send');
     // Menu penugasan dan penilaian
     Route::get('/penugasan', [MentorDashboardController::class, 'penugasan'])->name('mentor.penugasan');
     Route::post('/penugasan/tambah', [MentorDashboardController::class, 'tambahPenugasan'])->name('mentor.penugasan.tambah');

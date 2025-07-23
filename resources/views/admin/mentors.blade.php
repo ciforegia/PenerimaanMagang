@@ -35,6 +35,7 @@ use Carbon\Carbon;
                                         <th class="align-middle text-center">Nama Peserta</th>
                                         <th class="align-middle text-center">Judul Tugas</th>
                                         <th class="align-middle text-center" style="min-width: 120px;">Status</th>
+                                        <th class="align-middle text-center">Surat Penerimaan</th>
                                         <th class="align-middle text-center">Sertifikat</th>
                                         <th class="align-middle text-center">Aksi</th>
                                     </tr>
@@ -134,6 +135,13 @@ use Carbon\Carbon;
                                                         <span class="text-muted px-2">-</span>
                                                     @endif
                                                 </div>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                @if($participant->acceptance_letter_path)
+                                                    <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                                                @else
+                                                    <span class="text-danger"><i class="fas fa-times-circle"></i></span>
+                                                @endif
                                             </td>
                                             <td class="align-middle text-center">
                                                 @if($participant->user->certificates->count() > 0)

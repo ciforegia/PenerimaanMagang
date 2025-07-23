@@ -74,12 +74,18 @@ class AuthController extends Controller
             'phone' => 'required',
             'ktp_number' => 'required',
             'divisi_id' => 'required|exists:divisis,id',
-            'cover_letter' => 'required|file|mimes:pdf|max:2048',
+            'ktm' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ], [
             'password.different' => 'Password tidak boleh sama dengan username.'
         ]);
+
+        // Handle KTM upload
+        $ktmPath = null;
+        if ($request->hasFile('ktm')) {
+            $ktmPath = $request->file('ktm')->store('ktm', 'public');
+        }
 
         // Create user
         $user = User::create([
@@ -92,20 +98,16 @@ class AuthController extends Controller
             'major' => $request->major,
             'phone' => $request->phone,
             'ktp_number' => $request->ktp_number,
+            'ktm' => $ktmPath,
             'role' => 'peserta',
         ]);
-
-        // Handle file upload
-        if ($request->hasFile('cover_letter')) {
-            $path = $request->file('cover_letter')->store('cover_letters', 'public');
-        }
 
         // Create internship application
         InternshipApplication::create([
             'user_id' => $user->id,
             'divisi_id' => $request->divisi_id,
             'status' => 'pending',
-            'cover_letter_path' => $path ?? null,
+            'cover_letter_path' => null,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
         ]);

@@ -54,13 +54,11 @@ class DashboardController extends Controller
             ->where('status', 'accepted')
             ->whereDate('end_date', '<', now())
             ->update(['status' => 'finished']);
-        \Log::info('User ID: ' . $user->id);
         $application = $user->internshipApplications()
             ->with('divisi.subDirektorat.direktorat')
             ->whereIn('status', ['pending', 'accepted'])
             ->latest()
             ->first();
-        \Log::info('Application ID: ' . ($application ? $application->id : 'null') . ' | Status: ' . ($application ? $application->status : 'null'));
         if (!$application) {
             $application = $user->internshipApplications()
                 ->with('divisi.subDirektorat.direktorat')
@@ -226,5 +224,50 @@ class DashboardController extends Controller
         ]);
 
         return redirect('/dashboard')->with('success', 'Pengajuan ulang berhasil dikirim! Status akan diperbarui segera.');
+    }
+
+    public function acknowledgePersyaratanTambahan(Request $request)
+    {
+        $user = Auth::user();
+        $application = $user->internshipApplications()
+            ->where('status', 'accepted')
+            ->latest()
+            ->first();
+        if ($application) {
+            $application->acknowledged_additional_requirements = true;
+            $application->save();
+        }
+        return redirect()->route('dashboard.status');
+    }
+
+    public function submitAdditionalDocuments(Request $request)
+    {
+        $user = Auth::user();
+        $application = $user->internshipApplications()
+            ->where('status', 'accepted')
+            ->latest()
+            ->first();
+        if (!$application) {
+            return redirect()->route('dashboard.status')->with('error', 'Tidak ada pengajuan yang diterima.');
+        }
+        $request->validate([
+            'cover_letter' => 'required|file|mimes:pdf|max:2048',
+            'foto_nametag' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'screenshot_pospay' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'foto_prangko_prisma' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'ss_follow_ig_museum' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'ss_follow_ig_posindonesia' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'ss_subscribe_youtube' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+        // Upload files
+        $application->cover_letter_path = $request->file('cover_letter')->store('cover_letters', 'public');
+        $application->foto_nametag_path = $request->file('foto_nametag')->store('additional_docs', 'public');
+        $application->screenshot_pospay_path = $request->file('screenshot_pospay')->store('additional_docs', 'public');
+        $application->foto_prangko_prisma_path = $request->file('foto_prangko_prisma')->store('additional_docs', 'public');
+        $application->ss_follow_ig_museum_path = $request->file('ss_follow_ig_museum')->store('additional_docs', 'public');
+        $application->ss_follow_ig_posindonesia_path = $request->file('ss_follow_ig_posindonesia')->store('additional_docs', 'public');
+        $application->ss_subscribe_youtube_path = $request->file('ss_subscribe_youtube')->store('additional_docs', 'public');
+        $application->save();
+        return redirect()->route('dashboard.status')->with('success', 'Dokumen tambahan berhasil dikumpulkan!');
     }
 }

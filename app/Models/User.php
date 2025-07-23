@@ -27,6 +27,7 @@ class User extends Authenticatable
         'major',
         'phone',
         'ktp_number',
+        'ktm',
         'role',
         'divisi_id',
     ];

@@ -11,6 +11,7 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Peserta</th>
+                            <th>KTM</th>
                             <th>Email</th>
                             <th>No HP</th>
                             <th>Divisi</th>
@@ -25,6 +26,13 @@
                         <tr>
                             <td>{{ $i+1 }}</td>
                             <td>{{ $app->user->name ?? '-' }}</td>
+                            <td>
+                                @if($app->user && $app->user->ktm)
+                                    <a href="{{ asset('storage/' . $app->user->ktm) }}" target="_blank" class="btn btn-sm btn-outline-primary">Lihat KTM</a>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
                             <td>{{ $app->user->email ?? '-' }}</td>
                             <td>{{ $app->user->phone ?? '-' }}</td>
                             <td>{{ $app->divisi->name ?? '-' }}</td>

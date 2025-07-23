@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\InternshipApplication;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class MentorDashboardController extends Controller
 {
@@ -235,5 +238,71 @@ class MentorDashboardController extends Controller
             ]);
         }
         return redirect()->route('mentor.sertifikat')->with('success', 'Sertifikat berhasil diupload.');
+    }
+
+    public function showAcceptanceLetterForm($id)
+    {
+        $application = InternshipApplication::with(['user', 'divisi.subDirektorat.direktorat'])->findOrFail($id);
+        // Pastikan hanya mentor divisi terkait yang bisa akses
+        if (Auth::user()->divisi_id !== $application->divisi_id) {
+            abort(403);
+        }
+        // Hanya bisa jika sudah ada surat pengantar dan belum ada surat penerimaan
+        if (!$application->cover_letter_path || $application->acceptance_letter_path) {
+            return redirect()->route('mentor.pengajuan')->with('error', 'Surat Penerimaan hanya bisa dikirim jika Surat Pengantar sudah diupload dan belum pernah dikirim.');
+        }
+        return view('mentor.acceptance_letter_form', compact('application'));
+    }
+
+    public function previewAcceptanceLetter(Request $request, $id)
+    {
+        $application = InternshipApplication::with(['user', 'divisi.subDirektorat.direktorat'])->findOrFail($id);
+        if (Auth::user()->divisi_id !== $application->divisi_id) {
+            abort(403);
+        }
+        $data = $this->getAcceptanceLetterData($request, $application);
+        $pdf = Pdf::loadView('surat.surat_penerimaan', $data)->setPaper('A4', 'portrait');
+        return $pdf->stream('Surat_Penerimaan.pdf');
+    }
+
+    public function sendAcceptanceLetter(Request $request, $id)
+    {
+        $application = InternshipApplication::with(['user', 'divisi.subDirektorat.direktorat'])->findOrFail($id);
+        if (Auth::user()->divisi_id !== $application->divisi_id) {
+            abort(403);
+        }
+        if ($application->acceptance_letter_path) {
+            return redirect()->route('mentor.pengajuan')->with('error', 'Surat Penerimaan sudah pernah dikirim.');
+        }
+        $data = $this->getAcceptanceLetterData($request, $application);
+        $pdf = Pdf::loadView('surat.surat_penerimaan', $data)->setPaper('A4', 'portrait');
+        $filename = 'surat_penerimaan_' . $application->id . '_' . time() . '.pdf';
+        $path = 'acceptance_letters/' . $filename;
+        \Storage::disk('public')->put($path, $pdf->output());
+        $application->acceptance_letter_path = $path;
+        $application->save();
+        return redirect()->route('mentor.pengajuan')->with('success', 'Surat Penerimaan berhasil dikirim dan dapat diunduh oleh peserta.');
+    }
+
+    private function getAcceptanceLetterData(Request $request, $application)
+    {
+        $user = $application->user;
+        $divisi = $application->divisi;
+        $subdirektorat = $divisi->subDirektorat;
+        $direktorat = $subdirektorat->direktorat;
+        return [
+            'nomor_surat_penerimaan' => $request->input('nomor_surat_penerimaan'),
+            'nomor_surat_pengantar' => $request->input('nomor_surat_pengantar'),
+            'tanggal_surat_pengantar' => $request->input('tanggal_surat_pengantar'),
+            'tanggal_surat' => now()->format('d F Y'),
+            'asal_surat' => $user->university,
+            'divisi_mengeluarkan_surat' => $divisi->name,
+            'nama_peserta' => $user->name,
+            'nim' => $user->nim,
+            'jurusan' => $user->major,
+            'jabatan' => $divisi->pic_name ? 'PIC Divisi' : '',
+            'nama_pic' => $divisi->pic_name,
+            'nippos' => $divisi->nippos,
+        ];
     }
 } 

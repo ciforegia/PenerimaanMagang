@@ -165,11 +165,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="cover_letter" class="form-label">Surat Pengantar Kampus <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control @error('cover_letter') is-invalid @enderror" 
-                                   id="cover_letter" name="cover_letter" accept=".pdf" required>
-                            <div class="form-text">Format yang diterima: PDF (Maksimal 2MB)</div>
-                            @error('cover_letter')
+                            <label for="ktm" class="form-label">Kartu Tanda Mahasiswa (KTM) <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control @error('ktm') is-invalid @enderror" 
+                                   id="ktm" name="ktm" accept=".jpg,.jpeg,.png,.pdf" required>
+                            <div class="form-text">Format yang diterima: JPG, JPEG, PNG, PDF (Maksimal 2MB)</div>
+                            @error('ktm')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -191,6 +191,33 @@
                             </button>
                         </div>
                     </form>
+
+                    <!-- Modal Peraturan Magang -->
+                    <div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-sm modal-dialog-centered" style="max-width: 400px;">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="rulesModalLabel">Peraturan Pelaksanaan Magang</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body" style="max-height: 300px; overflow-y: auto;" id="rulesContent">
+                            <ol>
+                              <li>Peserta wajib mematuhi seluruh peraturan dan tata tertib yang berlaku di PT Pos Indonesia.</li>
+                              <li>Peserta dilarang melakukan tindakan yang dapat merugikan perusahaan, baik secara langsung maupun tidak langsung.</li>
+                              <li>Peserta wajib menjaga kerahasiaan data dan informasi perusahaan.</li>
+                              <li>Peserta wajib hadir dan mengikuti seluruh kegiatan magang sesuai jadwal yang telah ditentukan.</li>
+                              <li>Peserta wajib menjaga sikap, perilaku, dan sopan santun selama berada di lingkungan perusahaan.</li>
+                              <li>Peserta dilarang menyalahgunakan fasilitas perusahaan untuk kepentingan pribadi.</li>
+                              <li>Peserta wajib melaporkan setiap kendala atau permasalahan kepada pembimbing/mentor magang.</li>
+                              <li>Peraturan dapat berubah sewaktu-waktu sesuai kebijakan perusahaan.</li>
+                            </ol>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-primary w-100" id="agreeBtn" disabled>Saya setuju dan akan menaati peraturan yang ada</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
                     <div class="text-center mt-4">
                         <p class="mb-0">Sudah punya akun? 
@@ -216,6 +243,48 @@ document.addEventListener('DOMContentLoaded', function() {
         if (divisiSelect) {
             divisiSelect.value = divisiId;
         }
+    }
+
+    // Intercept form submit
+    const form = document.querySelector('form');
+    const rulesModal = new bootstrap.Modal(document.getElementById('rulesModal'));
+    let formShouldSubmit = false;
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!formShouldSubmit) {
+                e.preventDefault();
+                rulesModal.show();
+            }
+        });
+    }
+
+    // Enable agree button only after scroll to bottom
+    const rulesContent = document.getElementById('rulesContent');
+    const agreeBtn = document.getElementById('agreeBtn');
+    if (rulesContent && agreeBtn) {
+        rulesContent.addEventListener('scroll', function() {
+            const isBottom = rulesContent.scrollTop + rulesContent.clientHeight >= rulesContent.scrollHeight - 5;
+            if (isBottom) {
+                agreeBtn.disabled = false;
+            }
+        });
+        // Reset button if modal closed
+        document.getElementById('rulesModal').addEventListener('hidden.bs.modal', function () {
+            agreeBtn.disabled = true;
+            rulesContent.scrollTop = 0;
+        });
+    }
+
+    // On agree, submit the form
+    if (agreeBtn) {
+        agreeBtn.addEventListener('click', function() {
+            formShouldSubmit = true;
+            rulesModal.hide();
+            setTimeout(() => {
+                form.submit();
+            }, 300); // wait modal hide animation
+        });
     }
 });
 </script>

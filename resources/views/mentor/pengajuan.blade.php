@@ -24,10 +24,13 @@
                             <th>End Date</th>
                             <th>No KTP</th>
                             <th>No HP</th>
+                            <th>KTM</th>
                             <th>Surat Pengantar</th>
+                            <th>Surat Penerimaan</th>
                             <th>Status</th>
                             <th>Alasan</th>
                             <th>Aksi</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -44,10 +47,26 @@
                             <td>{{ $app->user->ktp_number ?? '-' }}</td>
                             <td>{{ $app->user->phone ?? '-' }}</td>
                             <td>
+                                @if($app->user && $app->user->ktm)
+                                    <a href="{{ asset('storage/' . $app->user->ktm) }}" target="_blank" class="btn btn-sm btn-outline-primary">Lihat KTM</a>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
                                 @if($app->cover_letter_path)
                                     <a href="{{ asset('storage/' . $app->cover_letter_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Lihat Surat</a>
                                 @else
                                     <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($app->acceptance_letter_path)
+                                    <a href="{{ asset('storage/' . $app->acceptance_letter_path) }}" target="_blank" class="btn btn-sm btn-success">Download Surat</a>
+                                @elseif($app->cover_letter_path)
+                                    <a href="{{ route('mentor.pengajuan.acceptance-letter.form', $app->id) }}" class="btn btn-sm btn-primary">Kirimkan Surat Penerimaan</a>
+                                @else
+                                    <button class="btn btn-sm btn-secondary" disabled>Kirimkan Surat Penerimaan</button>
                                 @endif
                             </td>
                             <td>

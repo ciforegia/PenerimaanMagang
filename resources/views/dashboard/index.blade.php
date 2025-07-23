@@ -23,6 +23,21 @@
         $isEndDatePassed = $latestApp && $latestApp->end_date && now()->isAfter($latestApp->end_date);
         $jumlahSertifikat = $isEndDatePassed ? $user->certificates->count() : 0;
         $revisiBaru = $user->assignments->where('is_revision', 1)->where('feedback', '!=', null)->count();
+        // Notifikasi persyaratan tambahan
+        $notifPersyaratan = false;
+        if(isset($application) && $application && $application->status == 'accepted') {
+            if(!$application->acknowledged_additional_requirements
+                || !$application->cover_letter_path
+                || !$application->foto_nametag_path
+                || !$application->screenshot_pospay_path
+                || !$application->foto_prangko_prisma_path
+                || !$application->ss_follow_ig_museum_path
+                || !$application->ss_follow_ig_posindonesia_path
+                || !$application->ss_subscribe_youtube_path) {
+                $notifPersyaratan = true;
+            }
+        }
+        $showAcceptanceNotif = isset($application) && $application && $application->acceptance_letter_path && !session('acceptance_letter_notif_shown');
     @endphp
     @if($tugasBaru > 0)
         <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -55,6 +70,21 @@
             <a href="{{ route('dashboard.assignments') }}" class="alert-link">Lihat Feedback</a>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+    @endif
+    @if($notifPersyaratan)
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Lengkapi persyaratan tambahan magang Anda!</strong> Silakan cek dan kumpulkan dokumen tambahan pada menu <a href="{{ route('dashboard.status') }}" class="alert-link">Status Pengajuan</a>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+    @if($showAcceptanceNotif)
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-envelope-open-text me-2"></i>
+            <strong>Surat Penerimaan Magang Anda sudah tersedia!</strong> Silakan download pada menu <a href="{{ route('dashboard.status') }}" class="alert-link">Status Pengajuan</a>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        @php session(['acceptance_letter_notif_shown' => true]); @endphp
     @endif
 
     <!-- User Info Card -->

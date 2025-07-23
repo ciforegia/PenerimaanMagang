@@ -66,11 +66,77 @@
                         @endif
 
                         @if($application->status == 'accepted')
+                            @if(!$application->acknowledged_additional_requirements)
+                                <div class="mt-4 p-3 bg-warning bg-opacity-10 border-start border-warning border-4">
+                                    <h6 class="text-warning mb-2">
+                                        <i class="fas fa-exclamation-circle me-2"></i>Persyaratan Tambahan
+                                    </h6>
+                                    <ol class="mb-3">
+                                        <li>Siapkan berkas pengajuan/permohonan dalam format pdf</li>
+                                        <li>Pastikan sudah install aplikasi PosPay (screenshot aplikasi)</li>
+                                        <li>Buat Prangko Prisma di loket Kantor Pos.</li>
+                                        <li>Lengkapi informasi dengan lengkap dan benar untuk pengiriman form Name Tag yang wajib digunakan selama proses internship</li>
+                                        <li>Link Name Tag: <a href="https://www.canva.com/design/DAF--E97Wqg/1d-ph6OCvDsncMRtKqbgXw/edit?utm_content=DAF--E97Wqg&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton" target="_blank">Klik di sini</a></li>
+                                    </ol>
+                                    <form method="POST" action="{{ route('dashboard.status.acknowledge') }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary">Saya mengerti</button>
+                                    </form>
+                                </div>
+                            @elseif(
+                                !$application->cover_letter_path ||
+                                !$application->foto_nametag_path ||
+                                !$application->screenshot_pospay_path ||
+                                !$application->foto_prangko_prisma_path ||
+                                !$application->ss_follow_ig_museum_path ||
+                                !$application->ss_follow_ig_posindonesia_path ||
+                                !$application->ss_subscribe_youtube_path
+                            )
+                                <div class="mt-4 p-3 bg-info bg-opacity-10 border-start border-info border-4">
+                                    <h6 class="text-info mb-2">
+                                        <i class="fas fa-upload me-2"></i>Upload Dokumen Tambahan
+                                    </h6>
+                                    <form method="POST" action="{{ route('dashboard.status.upload-additional') }}" enctype="multipart/form-data">
+                                        @csrf
+                                        <div class="mb-2">
+                                            <label class="form-label">Surat Pengantar Kampus (PDF)</label>
+                                            <input type="file" name="cover_letter" class="form-control" accept=".pdf" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label">Foto Name Tag</label>
+                                            <input type="file" name="foto_nametag" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label">Screenshot aplikasi PosPay</label>
+                                            <input type="file" name="screenshot_pospay" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label">Foto Prangko Prisma</label>
+                                            <input type="file" name="foto_prangko_prisma" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label">Screenshot follow Instagram (museumposindonesia)</label>
+                                            <input type="file" name="ss_follow_ig_museum" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label">Screenshot follow Instagram (posindonesia.ig)</label>
+                                            <input type="file" name="ss_follow_ig_posindonesia" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label">Screenshot subscribe Youtube (Pos Indonesia)</label>
+                                            <input type="file" name="ss_subscribe_youtube" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success mt-2">Kumpulkan</button>
+                                    </form>
+                                </div>
+                            @endif
+                        @endif
+                        @if($application->acceptance_letter_path)
                             <div class="mt-4 p-3 bg-success bg-opacity-10 border-start border-success border-4">
                                 <h6 class="text-success mb-2">
-                                    <i class="fas fa-check-circle me-2"></i>Selamat! Pengajuan Anda Diterima
+                                    <i class="fas fa-envelope-open-text me-2"></i>Surat Penerimaan Magang Anda
                                 </h6>
-                                <p class="mb-0">Tim HR akan menghubungi Anda segera untuk informasi selanjutnya.</p>
+                                <a href="{{ asset('storage/' . $application->acceptance_letter_path) }}" target="_blank" class="btn btn-success">Download Surat Penerimaan</a>
                             </div>
                         @endif
                     </div>
