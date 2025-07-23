@@ -138,9 +138,9 @@ use Carbon\Carbon;
                                             </td>
                                             <td class="align-middle text-center">
                                                 @if($participant->acceptance_letter_path)
-                                                    <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                                                    <a href="{{ asset('storage/' . $participant->acceptance_letter_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Lihat Surat</a>
                                                 @else
-                                                    <span class="text-danger"><i class="fas fa-times-circle"></i></span>
+                                                    <span class="text-muted">-</span>
                                                 @endif
                                             </td>
                                             <td class="align-middle text-center">

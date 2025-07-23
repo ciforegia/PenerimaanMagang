@@ -62,7 +62,7 @@
                             </td>
                             <td>
                                 @if($app->acceptance_letter_path)
-                                    <a href="{{ asset('storage/' . $app->acceptance_letter_path) }}" target="_blank" class="btn btn-sm btn-success">Download Surat</a>
+                                    <a href="{{ asset('storage/' . $app->acceptance_letter_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Lihat Surat</a>
                                 @elseif($app->cover_letter_path)
                                     <a href="{{ route('mentor.pengajuan.acceptance-letter.form', $app->id) }}" class="btn btn-sm btn-primary">Kirimkan Surat Penerimaan</a>
                                 @else

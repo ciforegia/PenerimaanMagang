@@ -294,6 +294,7 @@ class MentorDashboardController extends Controller
             'nomor_surat_penerimaan' => $request->input('nomor_surat_penerimaan'),
             'nomor_surat_pengantar' => $request->input('nomor_surat_pengantar'),
             'tanggal_surat_pengantar' => $request->input('tanggal_surat_pengantar'),
+            'tujuan_surat' => $request->input('tujuan_surat'),
             'tanggal_surat' => now()->format('d F Y'),
             'asal_surat' => $user->university,
             'divisi_mengeluarkan_surat' => $divisi->name,
