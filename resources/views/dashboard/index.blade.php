@@ -37,7 +37,7 @@
                 $notifPersyaratan = true;
             }
         }
-        $showAcceptanceNotif = isset($application) && $application && $application->acceptance_letter_path && !session('acceptance_letter_notif_shown');
+        $showAcceptanceNotif = isset($application) && $application && $application->acceptance_letter_path && is_null($application->acceptance_letter_downloaded_at);
     @endphp
     @if($tugasBaru > 0)
         <div class="alert alert-info alert-dismissible fade show" role="alert">

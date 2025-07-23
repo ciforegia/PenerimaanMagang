@@ -270,4 +270,16 @@ class DashboardController extends Controller
         $application->save();
         return redirect()->route('dashboard.status')->with('success', 'Dokumen tambahan berhasil dikumpulkan!');
     }
+
+    public function downloadAcceptanceLetterFlag(Request $request)
+    {
+        $user = auth()->user();
+        $application = $user->internshipApplications()->where('status', 'accepted')->latest()->first();
+        if ($application) {
+            $application->acceptance_letter_downloaded_at = now();
+            $application->save();
+        }
+        session(['download_acceptance_letter' => true]);
+        return response()->json(['success' => true]);
+    }
 }

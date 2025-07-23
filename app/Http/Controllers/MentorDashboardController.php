@@ -284,6 +284,47 @@ class MentorDashboardController extends Controller
         return redirect()->route('mentor.pengajuan')->with('success', 'Surat Penerimaan berhasil dikirim dan dapat diunduh oleh peserta.');
     }
 
+    public function showCertificateForm($userId)
+    {
+        $user = \App\Models\User::with(['certificates', 'internshipApplications' => function($q) {
+            $q->whereIn('status', ['accepted', 'finished']);
+        }, 'divisi'])->findOrFail($userId);
+        $application = $user->internshipApplications->sortByDesc('end_date')->first();
+        if (!$application) abort(404);
+        return view('mentor.certificate_form', compact('user', 'application'));
+    }
+
+    public function previewCertificate(Request $request, $userId)
+    {
+        $user = \App\Models\User::with(['certificates', 'internshipApplications' => function($q) {
+            $q->whereIn('status', ['accepted', 'finished']);
+        }, 'divisi'])->findOrFail($userId);
+        $application = $user->internshipApplications->sortByDesc('end_date')->first();
+        if (!$application) abort(404);
+        $data = $this->getCertificateData($request, $user, $application);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('surat.sertifikat', $data)->setPaper('A4', 'landscape');
+        return $pdf->stream('Sertifikat.pdf');
+    }
+
+    public function sendCertificate(Request $request, $userId)
+    {
+        $user = \App\Models\User::with(['certificates', 'internshipApplications' => function($q) {
+            $q->whereIn('status', ['accepted', 'finished']);
+        }, 'divisi'])->findOrFail($userId);
+        $application = $user->internshipApplications->sortByDesc('end_date')->first();
+        if (!$application) abort(404);
+        $data = $this->getCertificateData($request, $user, $application);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('surat.sertifikat', $data)->setPaper('A4', 'landscape');
+        $filename = 'sertifikat_' . $user->id . '_' . time() . '.pdf';
+        $path = 'certificates/' . $filename;
+        \Storage::disk('public')->put($path, $pdf->output());
+        $user->certificates()->create([
+            'certificate_path' => $path,
+            'issued_at' => now(),
+        ]);
+        return redirect()->route('mentor.sertifikat')->with('success', 'Sertifikat berhasil dikirim dan dapat diunduh oleh peserta.');
+    }
+
     private function getAcceptanceLetterData(Request $request, $application)
     {
         $user = $application->user;
@@ -304,6 +345,24 @@ class MentorDashboardController extends Controller
             'jabatan' => $divisi->pic_name ? 'PIC Divisi' : '',
             'nama_pic' => $divisi->pic_name,
             'nippos' => $divisi->nippos,
+        ];
+    }
+
+    private function getCertificateData(Request $request, $user, $application)
+    {
+        return [
+            'nomor_sertifikat' => $request->input('nomor_sertifikat'),
+            'predikat' => $request->input('predikat'),
+            'nama' => $user->name,
+            'universitas' => $user->university,
+            'jurusan' => $user->major,
+            'nim' => $user->nim,
+            'start_date' => $application->start_date,
+            'end_date' => $application->end_date,
+            'nama_pic' => $user->divisi ? $user->divisi->pic_name : '',
+            'nippos' => $user->divisi ? $user->divisi->nippos : '',
+            'jabatan' => $user->divisi ? 'PIC Divisi' : '',
+            'tanggal_sertifikat' => now()->format('d F Y'),
         ];
     }
 } 

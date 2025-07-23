@@ -54,11 +54,7 @@
                                     @if($p->user->certificates->count() > 0)
                                         <a href="{{ asset('storage/' . $p->user->certificates->first()->certificate_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Preview Sertifikat</a>
                                     @else
-                                        <form method="POST" action="{{ route('mentor.sertifikat.upload', $p->user->id) }}" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
-                                            @csrf
-                                            <input type="file" name="certificate" accept="application/pdf" required class="form-control form-control-sm" style="max-width:200px;">
-                                            <button type="submit" class="btn btn-primary btn-sm">Upload</button>
-                                        </form>
+                                        <a href="{{ route('mentor.sertifikat.form', $p->user->id) }}" class="btn btn-sm btn-primary">Kirimkan Sertifikat</a>
                                     @endif
                                 @else
                                     <span class="text-muted">Upload sertifikat hanya bisa dilakukan jika semua tugas sudah dinilai dan tidak ada tugas status revisi.</span>

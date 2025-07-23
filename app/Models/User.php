@@ -60,7 +60,7 @@ class User extends Authenticatable
      */
     public function internshipApplications()
     {
-        return $this->hasMany(InternshipApplication::class);
+        return $this->hasMany(\App\Models\InternshipApplication::class);
     }
 
     /**

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'accepted', 'rejected', 'finished', 'postponed'])->default('pending');
             $table->string('cover_letter_path')->nullable();
             $table->text('notes')->nullable();
+            $table->timestamp('acceptance_letter_downloaded_at')->nullable();
             $table->timestamps();
         });
     }

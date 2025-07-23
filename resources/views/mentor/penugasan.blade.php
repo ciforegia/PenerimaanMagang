@@ -64,18 +64,13 @@
                                         <td>{{ $assignment->feedback ?? '-' }}</td>
                                         <td>
                                             @if($assignment->submission_file_path)
-                                                @if($assignment->is_revision === null)
-                                                    <form method="POST" action="{{ route('mentor.penugasan.revisi', $assignment->id) }}" class="d-flex align-items-center gap-1">
-                                                        @csrf
-                                                        <button type="submit" name="is_revision" value="1" class="btn btn-outline-success btn-sm" title="Izinkan Revisi"><i class="fas fa-check"></i></button>
-                                                        <button type="submit" name="is_revision" value="0" class="btn btn-outline-danger btn-sm" title="Tolak Revisi"><i class="fas fa-times"></i></button>
-                                                    </form>
-                                                @elseif($assignment->is_revision === 1)
+                                                @if($assignment->is_revision === 1)
                                                     <span class="badge bg-danger">Revisi</span>
-                                                @elseif($assignment->is_revision === 0)
-                                                    <span class="badge bg-success">Tidak Revisi</span>
                                                 @else
-                                                    <span class="badge bg-secondary">Belum Ditentukan</span>
+                                                    <form method="POST" action="{{ route('mentor.penugasan.revisi', $assignment->id) }}">
+                                                        @csrf
+                                                        <button type="submit" name="is_revision" value="1" class="btn btn-danger btn-sm" @if($assignment->grade !== null) disabled @endif>Revisi</button>
+                                                    </form>
                                                 @endif
                                             @else
                                                 <span class="text-muted">-</span>

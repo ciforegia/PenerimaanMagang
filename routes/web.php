@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     // Change password routes
     Route::get('/dashboard/change-password', [AuthController::class, 'showChangePasswordForm'])->name('password.change');
     Route::post('/dashboard/change-password', [AuthController::class, 'changePassword'])->name('password.update');
+    Route::post('/dashboard/status/download-acceptance', [DashboardController::class, 'downloadAcceptanceLetterFlag'])->name('dashboard.status.download-acceptance');
 });
 
 // Mentor (Pembimbing) dashboard routes
@@ -66,6 +67,9 @@ Route::middleware(['auth'])->prefix('mentor')->group(function () {
     // Menu sertifikat
     Route::get('/sertifikat', [MentorDashboardController::class, 'sertifikat'])->name('mentor.sertifikat');
     Route::post('/sertifikat/{user}/upload', [MentorDashboardController::class, 'uploadSertifikat'])->name('mentor.sertifikat.upload');
+    Route::get('/sertifikat/{user}/form', [MentorDashboardController::class, 'showCertificateForm'])->name('mentor.sertifikat.form');
+    Route::post('/sertifikat/{user}/preview', [MentorDashboardController::class, 'previewCertificate'])->name('mentor.sertifikat.preview');
+    Route::post('/sertifikat/{user}/send', [MentorDashboardController::class, 'sendCertificate'])->name('mentor.sertifikat.send');
     // Menu profil
     Route::get('/profil', [MentorDashboardController::class, 'profil'])->name('mentor.profil');
 });
