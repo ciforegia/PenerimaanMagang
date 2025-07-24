@@ -143,6 +143,7 @@ class DashboardController extends Controller
         $user = Auth::user();
         $certificates = collect();
         $latestApp = $user->internshipApplications()->whereIn('status', ['accepted', 'finished'])->latest()->first();
+        // Tampilkan sertifikat hanya jika end_date sudah lewat
         if ($latestApp && $latestApp->end_date && now()->isAfter($latestApp->end_date)) {
             $certificates = $user->certificates()->orderBy('created_at', 'desc')->get();
         }
@@ -161,7 +162,9 @@ class DashboardController extends Controller
         }
 
         if (Storage::disk('public')->exists($certificate->certificate_path)) {
-            return Storage::disk('public')->download($certificate->certificate_path);
+            $user = Auth::user();
+            $filename = 'Sertifikat_' . str_replace(' ', '_', $user->name) . '_' . $user->nim . '.pdf';
+            return Storage::disk('public')->download($certificate->certificate_path, $filename);
         }
 
         abort(404);
@@ -269,6 +272,17 @@ class DashboardController extends Controller
         $application->ss_subscribe_youtube_path = $request->file('ss_subscribe_youtube')->store('additional_docs', 'public');
         $application->save();
         return redirect()->route('dashboard.status')->with('success', 'Dokumen tambahan berhasil dikumpulkan!');
+    }
+
+    public function downloadAcceptanceLetter()
+    {
+        $user = Auth::user();
+        $application = $user->internshipApplications()->whereIn('status', ['accepted', 'finished'])->latest()->first();
+        if ($application && $application->acceptance_letter_path && Storage::disk('public')->exists($application->acceptance_letter_path)) {
+            $filename = 'Surat Penerimaan_' . str_replace(' ', '_', $user->name) . '_' . $user->nim . '.pdf';
+            return Storage::disk('public')->download($application->acceptance_letter_path, $filename);
+        }
+        abort(404);
     }
 
     public function downloadAcceptanceLetterFlag(Request $request)

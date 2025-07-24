@@ -99,7 +99,7 @@
                                 <div class="col-md-6">
                                     <p class="mb-1"><strong>Nama:</strong> {{ $user->name }}</p>
                                     <p class="mb-1"><strong>NIM:</strong> {{ $user->nim }}</p>
-                                    <p class="mb-1"><strong>Universitas:</strong> {{ $user->university }}</p>
+                                    <p class="mb-1"><strong>Universitas/Sekolah:</strong> {{ $user->university }}</p>
                                     <p class="mb-1"><strong>Jurusan:</strong> {{ $user->major }}</p>
                                 </div>
                                 <div class="col-md-6">
@@ -257,7 +257,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    @if($user->certificates->count() > 0)
+                    @if($isEndDatePassed && $user->certificates->count() > 0)
                         @foreach($user->certificates->take(3) as $certificate)
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>

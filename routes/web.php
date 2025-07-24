@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/change-password', [AuthController::class, 'showChangePasswordForm'])->name('password.change');
     Route::post('/dashboard/change-password', [AuthController::class, 'changePassword'])->name('password.update');
     Route::post('/dashboard/status/download-acceptance', [DashboardController::class, 'downloadAcceptanceLetterFlag'])->name('dashboard.status.download-acceptance');
+    Route::get('/dashboard/acceptance-letter/download', [DashboardController::class, 'downloadAcceptanceLetter'])->name('dashboard.acceptance-letter.download');
 });
 
 // Mentor (Pembimbing) dashboard routes

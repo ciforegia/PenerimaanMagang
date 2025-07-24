@@ -136,7 +136,7 @@
                                 <h6 class="text-success mb-2">
                                     <i class="fas fa-envelope-open-text me-2"></i>Surat Penerimaan Magang Anda
                                 </h6>
-                                <a href="{{ asset('storage/' . $application->acceptance_letter_path) }}" target="_blank" class="btn btn-success" onclick="fetch('{{ route('dashboard.status.download-acceptance') }}', {method: 'POST', headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}})">Download Surat Penerimaan</a>
+                                <a href="{{ route('dashboard.acceptance-letter.download') }}" class="btn btn-success" target="_blank">Download Surat Penerimaan</a>
                             </div>
                         @endif
                     </div>

@@ -15,10 +15,6 @@
             padding: 0;
         }
         @font-face {
-            font-family: 'Anton';
-            src: url('{{ storage_path('fonts/Anton-Regular.ttf') }}') format('truetype');
-        }
-        @font-face {
             font-family: 'Sora';
             src: url('{{ storage_path('fonts/Sora-VariableFont_wght.ttf') }}') format('truetype');
         }
@@ -41,65 +37,76 @@
             margin: 0 auto;
             padding-top: 60px;
         }
-        .judul {
-            font-family: 'Anton', Arial, sans-serif;
-            font-size: 64px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-align: center;
-            color: #152d5d;
-            margin-bottom: 24px;
-        }
         .nomor {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 28px;
+            font-size: 50px;
             color: #152d5d;
             text-align: left;
             margin-bottom: 12px;
             margin-top: 390px;
+            margin-left: 134px;
         }
         .subjudul {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 32px;
+            font-size: 40px;
             color: #152d5d;
+            text-align: left;
             margin-bottom: 24px;
+            margin-top: 0px;
+            margin-left: 134px;
         }
         .nama {
-            font-family: 'Anton', Arial, sans-serif;
-            font-size: 64px;
+            font-family: 'anton_normal';
+            font-size: 80px;
             color: #152d5d;
             font-weight: bold;
             margin-bottom: 12px;
+            margin-left: 134px;
+            text-transform: uppercase;
         }
         .identitas {
             font-family: 'Sora', Arial, sans-serif;
-            font-size: 18px;
+            font-size: 28px;
             color: #152d5d;
             margin-bottom: 16px;
+            margin-left: 134px;
+            text-transform: uppercase;
         }
         .deskripsi {
             font-family: 'Sora', Arial, sans-serif;
-            font-size: 18px;
+            font-size: 28px;
             color: #152d5d;
             margin-bottom: 24px;
-            
+            margin-left: 134px;
+            margin-right: 150px;
         }
         .footer {
             font-family: 'Sora', Arial, sans-serif;
-            font-size: 18px;
+            font-size: 28px;
             color: #152d5d;
             margin-top: 40px;
+            margin-left: 134px;
+        }
+        .footer .jabatan{
+            font-family: 'Sora', Arial, sans-serif;
+            font-size: 28px;
+            color: #152d5d;
+            margin-top: 40px;
+            margin-left: 88px;
         }
         .ttd {
             margin-top: 60px;
             font-family: 'Sora', Arial, sans-serif;
-            font-size: 18px;
+            font-size: 28px;
             color: #152d5d;
+            margin-left: 155px;
         }
         .ttd .nama {
             font-family: 'Sora', Arial, sans-serif;
-            font-size: 20px;
+            font-size: 28px;
             font-weight: bold;
+            margin-top: 150px;
+            margin-left: 45px;
         }
     </style>
 </head>
@@ -112,11 +119,11 @@
         <div class="identitas">{{ $universitas }}, {{ $jurusan }}, {{ $nim }}</div>
         <div class="deskripsi">
             Sebagai ucapan terima kasih atas kegiatan Praktik Kerja Lapangan di PT Pos Indonesia (Persero) pada tanggal
-            {{ $start_date }} - {{ $end_date }} dengan hasil <b>{{ $predikat }}</b>.
+            {{ $start_date }} hingga {{ $end_date }} dengan hasil <b>{{ $predikat }}</b>.
         </div>
         <div class="footer">
-            Bandung, {{ $tanggal_sertifikat }}<br>
-            {{ $jabatan }}
+            Bandung, {{ $tanggal_sertifikat }}
+            <div class="jabatan">{{ $jabatan }}</div>
         </div>
         <div class="ttd">
             <div class="nama">{{ $nama_pic }}</div>
