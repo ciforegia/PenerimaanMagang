@@ -175,7 +175,7 @@ use Carbon\Carbon;
                                             <td class="align-middle text-start"><span class="badge bg-warning">{{ $pendingCount }}</span></td>
                                             <td class="align-middle text-start"><span class="badge bg-info">{{ $acceptedCount }}</span></td>
                                             <td class="align-middle text-start"><span class="badge bg-success">0</span></td>
-                                            <td class="text-center text-muted align-middle" colspan="4">Tidak ada peserta magang aktif</td>
+                                            <td class="text-center text-muted align-middle" colspan="5">Tidak ada peserta magang aktif</td>
                                             <td class="align-middle text-start">
                                                 <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#resetPasswordModal{{ $mentor->id }}">
                                                     <i class="fas fa-key me-1"></i>Reset Password

@@ -71,7 +71,9 @@
                                                 }
                                             }
                                         @endphp
-                                        @if($showBelumKumpul)
+                                        @if(!$assignment->submitted_at)
+                                            <span class="text-danger"><i class="fas fa-times"></i> Belum dikumpulkan</span>
+                                        @elseif($showBelumKumpul)
                                             <span class="text-danger"><i class="fas fa-times"></i> Belum dikumpulkan (Revisi)</span>
                                         @else
                                             <span class="text-success"><i class="fas fa-check"></i> Sudah dikumpulkan</span>
