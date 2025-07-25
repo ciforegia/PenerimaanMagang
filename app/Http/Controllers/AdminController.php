@@ -9,6 +9,9 @@ use App\Models\Divisi;
 use App\Models\InternshipApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ReportExport;
 
 class AdminController extends Controller
 {
@@ -66,6 +69,201 @@ class AdminController extends Controller
             });
 
         return view('admin.mentors', compact('mentors'));
+    }
+
+    /**
+     * Tampilkan halaman report peserta magang
+     */
+    public function report()
+    {
+        return view('admin.reports');
+    }
+
+    /**
+     * Ambil data report peserta magang berdasarkan filter
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getReportData(Request $request)
+    {
+        $groupBy = $request->input('group_by', 'direktorat');
+        $period = $request->input('period', 'mingguan');
+        $classification = $request->input('classification', 'all');
+        $year = $request->input('year');
+        $month = $request->input('month');
+        $week = $request->input('week');
+        $now = now();
+
+        $query = 
+            \App\Models\InternshipApplication::query()
+            ->whereIn('status', ['accepted', 'finished']) // Perbaikan: tampilkan peserta sedang dan sudah selesai
+            ->whereNotNull('start_date')
+            ->with(['user.certificates', 'divisi.subDirektorat.direktorat']);
+
+        // Filter periode
+        if ($period === 'mingguan' && $week) {
+            $start = \Carbon\Carbon::parse($week);
+            $end = (clone $start)->addDays(6);
+        } elseif ($period === 'bulanan' && $year && $month) {
+            $start = \Carbon\Carbon::create($year, $month, 1)->startOfMonth();
+            $end = \Carbon\Carbon::create($year, $month, 1)->endOfMonth();
+        } elseif ($period === 'tahunan' && $year) {
+            $start = \Carbon\Carbon::create($year, 1, 1)->startOfYear();
+            $end = \Carbon\Carbon::create($year, 1, 1)->endOfYear();
+        } else {
+            if ($period === 'mingguan') {
+                $start = $now->copy()->startOfWeek();
+                $end = $now->copy()->endOfWeek();
+            } elseif ($period === 'bulanan') {
+                $start = $now->copy()->startOfMonth();
+                $end = $now->copy()->endOfMonth();
+            } else { // tahunan
+                $start = $now->copy()->startOfYear();
+                $end = $now->copy()->endOfYear();
+            }
+        }
+        // Perbaikan: tampilkan peserta jika ada overlap antara periode magang dan periode yang dipilih
+        $query->where(function($q) use ($start, $end) {
+            $q->where(function($sub) use ($start, $end) {
+                $sub->whereDate('start_date', '<=', $end->toDateString())
+                     ->where(function($sub2) use ($start) {
+                         $sub2->whereNull('end_date')
+                               ->orWhereDate('end_date', '>=', $start->toDateString());
+                     });
+            });
+        });
+
+        // Filter klasifikasi
+        if ($classification !== 'all') {
+            if ($groupBy === 'direktorat') {
+                $query->whereHas('divisi.subDirektorat.direktorat', function($q) use ($classification) {
+                    $q->where('id', $classification);
+                });
+            } elseif ($groupBy === 'subdirektorat') {
+                $query->whereHas('divisi.subDirektorat', function($q) use ($classification) {
+                    $q->where('id', $classification);
+                });
+            } else { // divisi
+                $query->whereHas('divisi', function($q) use ($classification) {
+                    $q->where('id', $classification);
+                });
+            }
+        }
+
+        $applications = $query->orderBy('start_date', 'asc')->get();
+
+        // Data peserta detail
+        $peserta = $applications->map(function($app, $i) {
+            $user = $app->user;
+            $certificate = $user && $user->certificates ? $user->certificates->sortByDesc('issued_at')->first() : null;
+            return [
+                'no' => $i+1,
+                'nama' => $user->name ?? '-',
+                'universitas' => $user->university ?? '-',
+                'jurusan' => $user->major ?? '-',
+                'nim' => $user->nim ?? '-',
+                'tanggal_mulai' => $app->start_date ?? '-',
+                'tanggal_berakhir' => $app->end_date ?? '-',
+                'divisi' => $app->divisi->name ?? '-',
+                'subdirektorat' => $app->divisi->subDirektorat->name ?? '-',
+                'direktorat' => $app->divisi->subDirektorat->direktorat->name ?? '-',
+                'predikat' => $certificate && $certificate->predikat ? $certificate->predikat : '-',
+            ];
+        })->toArray();
+
+        return response()->json([
+            'data' => $peserta
+        ]);
+    }
+
+    /**
+     * Ambil data klasifikasi (direktorat, subdirektorat, divisi) untuk dropdown dinamis
+     */
+    public function getReportClassifications(Request $request)
+    {
+        $groupBy = $request->input('group_by', 'direktorat');
+        if ($groupBy === 'direktorat') {
+            $items = \App\Models\Direktorat::orderBy('name')->get(['id', 'name']);
+        } elseif ($groupBy === 'subdirektorat') {
+            $items = \App\Models\SubDirektorat::orderBy('name')->get(['id', 'name']);
+        } else {
+            $items = \App\Models\Divisi::orderBy('name')->get(['id', 'name']);
+        }
+        return response()->json([
+            'data' => $items
+        ]);
+    }
+
+    /**
+     * Ambil data periode detail (tahun, bulan, minggu) untuk dropdown dinamis
+     */
+    public function getReportPeriods(Request $request)
+    {
+        $period = $request->input('period', 'tahunan');
+        $year = $request->input('year');
+        $data = [];
+
+        $minDate = \App\Models\InternshipApplication::min('created_at');
+        $maxDate = \App\Models\InternshipApplication::max('created_at');
+        if (!$minDate || !$maxDate) {
+            return response()->json(['data' => []]);
+        }
+        $minYear = date('Y', strtotime($minDate));
+        $maxYear = date('Y', strtotime($maxDate));
+
+        if ($period === 'tahunan') {
+            for ($y = $minYear; $y <= $maxYear; $y++) {
+                $data[] = [ 'value' => $y, 'label' => $y ];
+            }
+        } elseif ($period === 'bulanan') {
+            for ($y = $minYear; $y <= $maxYear; $y++) {
+                $months = [
+                    1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+                    7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                ];
+                foreach ($months as $num => $name) {
+                    $data[] = [ 'value' => sprintf('%02d', $num).'-'.$y, 'label' => $name.' '.$y ];
+                }
+            }
+        } elseif ($period === 'mingguan') {
+            for ($y = $minYear; $y <= $maxYear; $y++) {
+                $start = new \DateTime("first monday of January $y");
+                $end = new \DateTime("last sunday of December $y");
+                while ($start <= $end) {
+                    $weekStart = clone $start;
+                    $weekEnd = (clone $start)->modify('+6 days');
+                    if ($weekEnd->format('Y') > $y) break;
+                    $data[] = [
+                        'value' => $weekStart->format('Y-m-d'),
+                        'label' => $weekStart->format('d M Y') . ' - ' . $weekEnd->format('d M Y')
+                    ];
+                    $start->modify('+7 days');
+                }
+            }
+        }
+        return response()->json(['data' => $data, 'minYear' => $minYear, 'maxYear' => $maxYear]);
+    }
+
+    /**
+     * Export report peserta magang ke PDF
+     */
+    public function exportReportPdf(Request $request)
+    {
+        $data = $this->getReportData($request)->getData(true)['data'];
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.report_pdf', [
+            'data' => $data,
+        ])->setPaper('a4', 'landscape');
+        return $pdf->download('report_peserta_magang.pdf');
+    }
+
+    /**
+     * Export report peserta magang ke Excel
+     */
+    public function exportReportExcel(Request $request)
+    {
+        $data = $this->getReportData($request)->getData(true)['data'];
+        $export = new \App\Exports\ReportExport($data);
+        return \Maatwebsite\Excel\Facades\Excel::download($export, 'report_peserta_magang.xlsx');
     }
 
     // Direktorat CRUD Methods

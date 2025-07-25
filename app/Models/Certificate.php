@@ -12,7 +12,10 @@ class Certificate extends Model
     protected $fillable = [
         'user_id',
         'certificate_path',
-        'issued_at'
+        'issued_at',
+        'internship_application_id',
+        'nomor_sertifikat',
+        'predikat',
     ];
 
     protected $casts = [

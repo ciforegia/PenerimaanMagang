@@ -98,3 +98,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Mentor management
     Route::post('/mentor/{id}/reset-password', [AdminController::class, 'resetMentorPassword'])->name('mentor.reset-password');
 });
+
+// Report peserta magang
+Route::get('/admin/reports', [\App\Http\Controllers\AdminController::class, 'report'])->name('admin.reports');
+Route::get('/admin/reports/data', [\App\Http\Controllers\AdminController::class, 'getReportData'])->name('admin.reports.data');
+Route::get('/admin/reports/export/pdf', [\App\Http\Controllers\AdminController::class, 'exportReportPdf'])->name('admin.reports.export.pdf');
+Route::get('/admin/reports/export/excel', [\App\Http\Controllers\AdminController::class, 'exportReportExcel'])->name('admin.reports.export.excel');
+Route::get('/admin/reports/classifications', [\App\Http\Controllers\AdminController::class, 'getReportClassifications'])->name('admin.reports.classifications');
+Route::get('/admin/reports/periods', [\App\Http\Controllers\AdminController::class, 'getReportPeriods'])->name('admin.reports.periods');

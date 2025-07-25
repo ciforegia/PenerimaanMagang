@@ -43,6 +43,11 @@
                             <i class="fas fa-user-tie me-2"></i>Monitoring Pembimbing
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('admin.reports') }}" class="nav-link text-white">
+                            <i class="fas fa-chart-bar me-2"></i>Report Peserta Magang
+                        </a>
+                    </li>
                 </ul>
                 <hr>
                 <div>

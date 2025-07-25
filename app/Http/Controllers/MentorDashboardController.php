@@ -321,6 +321,8 @@ class MentorDashboardController extends Controller
         $user->certificates()->create([
             'certificate_path' => $path,
             'issued_at' => now(),
+            'nomor_sertifikat' => $request->input('nomor_sertifikat'),
+            'predikat' => $request->input('predikat'),
         ]);
         return redirect()->route('mentor.sertifikat')->with('success', 'Sertifikat berhasil dikirim dan dapat diunduh oleh peserta.');
     }
