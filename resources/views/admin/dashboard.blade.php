@@ -72,5 +72,49 @@
             </div>
         </div>
     </div>
+
+    <!-- Peraturan -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-gavel me-2"></i>Peraturan Saat Ini</h5>
+            <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#editRuleModal">
+                <i class="fas fa-pen me-1"></i> Edit Peraturan
+            </button>
+        </div>
+        <div class="card-body">
+            @if($rule && $rule->content)
+                <div style="white-space: pre-line;">{!! nl2br(e($rule->content)) !!}</div>
+            @else
+                <span class="text-muted">Belum ada peraturan yang ditetapkan.</span>
+            @endif
+        </div>
+    </div>
+    <!-- Modal Edit Peraturan -->
+    <div class="modal fade" id="editRuleModal" tabindex="-1" aria-labelledby="editRuleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editRuleModalLabel">Edit Peraturan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ route('admin.rules.update') }}">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Isi Peraturan</label>
+                            <textarea name="content" id="content" class="form-control" rows="8" required>{{ old('content', $rule ? $rule->content : '') }}</textarea>
+                            @error('content')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection 

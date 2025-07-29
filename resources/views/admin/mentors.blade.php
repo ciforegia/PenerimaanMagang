@@ -59,7 +59,7 @@ use Carbon\Carbon;
                                             @if($participantIndex == 0)
                                                 <td rowspan="{{ $rowspan }}" class="align-middle text-start">{{ $rowNumber++ }}</td>
                                                 <td style="min-width: 180px;" rowspan="{{ $rowspan }}" class="align-middle text-start">
-                                                    <strong>{{ $mentor->divisi->pic_name ?? '-' }}</strong>
+                                                    <strong>{{ $mentor->divisi->vp ?? '-' }}</strong>
                                                     @if($mentor->divisi)
                                                         <br><small class="text-muted">{{ $mentor->divisi->subDirektorat->direktorat->name ?? '' }}</small>
                                                     @endif
@@ -162,7 +162,7 @@ use Carbon\Carbon;
                                     @else
                                         <tr>
                                             <td class="align-middle text-start">{{ $rowNumber++ }}</td>
-                                            <td class="align-middle text-start"><strong>{{ $mentor->divisi->pic_name ?? '-' }}</strong></td>
+                                            <td class="align-middle text-start"><strong>{{ $mentor->divisi->vp ?? '-' }}</strong></td>
                                             <td class="align-middle text-start">
                                                 @if($mentor->divisi)
                                                     <span class="badge bg-info">{{ $mentor->divisi->name }}</span>

@@ -17,7 +17,7 @@
                         <strong>Jurusan:</strong> {{ $application->user->major }}<br>
                         <strong>Asal (Universitas/Sekolah):</strong> {{ $application->user->university }}<br>
                         <strong>Divisi:</strong> {{ $application->divisi->name }}<br>
-                        <strong>PIC Divisi:</strong> {{ $application->divisi->pic_name }}<br>
+                        <strong>VP Divisi:</strong> {{ $application->divisi->vp }}<br>
                         <strong>NIPPOS:</strong> {{ $application->divisi->nippos }}<br>
                     </div>
                     <form method="POST" action="{{ route('mentor.pengajuan.acceptance-letter.send', $application->id) }}">

@@ -192,6 +192,8 @@
                         </div>
                     </form>
 
+                    {{-- Hapus/blokir tampilan peraturan di bawah form registrasi --}}
+
                     <!-- Modal Peraturan Magang -->
                     <div class="modal fade" id="rulesModal" tabindex="-1" aria-labelledby="rulesModalLabel" aria-hidden="true">
                       <div class="modal-dialog modal-sm modal-dialog-centered" style="max-width: 400px;">
@@ -201,19 +203,15 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
                           <div class="modal-body" style="max-height: 300px; overflow-y: auto;" id="rulesContent">
-                            <ol>
-                              <li>Peserta wajib mematuhi seluruh peraturan dan tata tertib yang berlaku di PT Pos Indonesia.</li>
-                              <li>Peserta dilarang melakukan tindakan yang dapat merugikan perusahaan, baik secara langsung maupun tidak langsung.</li>
-                              <li>Peserta wajib menjaga kerahasiaan data dan informasi perusahaan.</li>
-                              <li>Peserta wajib hadir dan mengikuti seluruh kegiatan magang sesuai jadwal yang telah ditentukan.</li>
-                              <li>Peserta wajib menjaga sikap, perilaku, dan sopan santun selama berada di lingkungan perusahaan.</li>
-                              <li>Peserta dilarang menyalahgunakan fasilitas perusahaan untuk kepentingan pribadi.</li>
-                              <li>Peserta wajib melaporkan setiap kendala atau permasalahan kepada pembimbing/mentor magang.</li>
-                              <li>Peraturan dapat berubah sewaktu-waktu sesuai kebijakan perusahaan.</li>
-                            </ol>
+                            @php $rule = \App\Models\Rule::first(); @endphp
+                            @if($rule && $rule->content)
+                                <div style="white-space: pre-line;">{!! nl2br(e($rule->content)) !!}</div>
+                            @else
+                                <span class="text-muted">Belum ada peraturan yang ditetapkan.</span>
+                            @endif
                           </div>
                           <div class="modal-footer">
-                            <button type="button" class="btn btn-primary w-100" id="agreeBtn" disabled>Saya setuju dan akan menaati peraturan yang ada</button>
+                            <button type="button" class="btn btn-primary w-100" id="agreeBtn" disabled>Saya mengerti dan setuju</button>
                           </div>
                         </div>
                       </div>

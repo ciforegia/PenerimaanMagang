@@ -34,11 +34,6 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.divisions') }}" class="nav-link text-white">
-                            <i class="fas fa-sitemap me-2"></i>Divisi
-                        </a>
-                    </li>
-                    <li>
                         <a href="{{ route('admin.mentors') }}" class="nav-link text-white">
                             <i class="fas fa-user-tie me-2"></i>Monitoring Pembimbing
                         </a>
@@ -46,6 +41,11 @@
                     <li>
                         <a href="{{ route('admin.reports') }}" class="nav-link text-white">
                             <i class="fas fa-chart-bar me-2"></i>Report Peserta Magang
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.divisions') }}" class="nav-link text-white">
+                            <i class="fas fa-sitemap me-2"></i>Divisi
                         </a>
                     </li>
                 </ul>

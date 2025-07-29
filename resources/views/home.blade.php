@@ -120,7 +120,7 @@
                                                                             <div class="row">
                                                                                 <div class="col-6">
                                                                                     <small class="text-muted">PIC:</small><br>
-                                                                                    <strong>{{ $divisi->pic_name }}</strong>
+                                                                                    <strong>{{ $divisi->vp }}</strong>
                                                                                 </div>
                                                                                 <div class="col-6">
                                                                                     <small class="text-muted">NIPPOS:</small><br>

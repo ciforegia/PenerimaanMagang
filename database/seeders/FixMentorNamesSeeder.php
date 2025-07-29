@@ -21,12 +21,12 @@ class FixMentorNamesSeeder extends Seeder
             $divisi = Divisi::find($mentor->divisi_id);
             
             if ($divisi) {
-                // Update nama pembimbing sesuai dengan pic_name divisi
+                // Update nama pembimbing sesuai dengan vp divisi
                 $mentor->update([
-                    'name' => $divisi->pic_name
+                    'name' => $divisi->vp
                 ]);
                 
-                $this->command->info("Updated mentor {$mentor->username} name from '{$mentor->getOriginal('name')}' to '{$divisi->pic_name}'");
+                $this->command->info("Updated mentor {$mentor->username} name from '{$mentor->getOriginal('name')}' to '{$divisi->vp}'");
             } else {
                 $this->command->warn("Mentor {$mentor->username} has no associated divisi (divisi_id: {$mentor->divisi_id})");
             }

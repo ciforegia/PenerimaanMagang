@@ -13,7 +13,7 @@
                 <dt class="col-sm-3">Email</dt>
                 <dd class="col-sm-9">{{ $user->email }}</dd>
                 <dt class="col-sm-3">Nama Pembimbing</dt>
-                <dd class="col-sm-9">{{ $divisi ? $divisi->pic_name : '-' }}</dd>
+                <dd class="col-sm-9">{{ $divisi ? $divisi->vp : '-' }}</dd>
                 <dt class="col-sm-3">Nippos</dt>
                 <dd class="col-sm-9">{{ $divisi ? $divisi->nippos : '-' }}</dd>
                 <dt class="col-sm-3">Direktorat</dt>

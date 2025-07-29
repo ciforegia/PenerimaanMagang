@@ -9,7 +9,7 @@ class Divisi extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'sub_direktorat_id', 'pic_name', 'nippos'];
+    protected $fillable = ['name', 'sub_direktorat_id', 'vp', 'nippos'];
 
     /**
      * Get the sub direktorat that owns the divisi.

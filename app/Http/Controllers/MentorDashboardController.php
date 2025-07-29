@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\InternshipApplication;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MentorDashboardController extends Controller
 {
@@ -278,7 +280,7 @@ class MentorDashboardController extends Controller
         $pdf = Pdf::loadView('surat.surat_penerimaan', $data)->setPaper('A4', 'portrait');
         $filename = 'surat_penerimaan_' . $application->id . '_' . time() . '.pdf';
         $path = 'acceptance_letters/' . $filename;
-        \Storage::disk('public')->put($path, $pdf->output());
+        Storage::disk('public')->put($path, $pdf->output());
         $application->acceptance_letter_path = $path;
         $application->save();
         return redirect()->route('mentor.pengajuan')->with('success', 'Surat Penerimaan berhasil dikirim dan dapat diunduh oleh peserta.');
@@ -317,7 +319,7 @@ class MentorDashboardController extends Controller
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('surat.sertifikat', $data)->setPaper('A4', 'landscape');
         $filename = 'sertifikat_' . $user->id . '_' . time() . '.pdf';
         $path = 'certificates/' . $filename;
-        \Storage::disk('public')->put($path, $pdf->output());
+        Storage::disk('public')->put($path, $pdf->output());
         $user->certificates()->create([
             'certificate_path' => $path,
             'issued_at' => now(),
@@ -333,25 +335,64 @@ class MentorDashboardController extends Controller
         $divisi = $application->divisi;
         $subdirektorat = $divisi->subDirektorat;
         $direktorat = $subdirektorat->direktorat;
+        $qrData = json_encode([
+            'type' => 'internship_data',
+            'nama' => $user->name,
+            'nim' => $user->nim,
+            'universitas' => $user->university,
+            'jurusan' => $user->major,
+            'divisi' => $divisi->name,
+            'tanggal_mulai' => $application->start_date,
+            'tanggal_selesai' => $application->end_date,
+            'ktm' => $user->ktm,
+        ]);
+        
+        // Format data dengan prefix yang menghindari interpretasi sebagai nomor telepon
+        $qrText = "PESERTA MAGANG PT POS INDONESIA\n\nNama: " . $user->name . "\nID Mahasiswa: " . $user->nim . "\nUniversitas: " . $user->university . "\nDivisi: " . $divisi->name . "\n\nData ini valid dan dapat diverifikasi.";
+        $qrSvg = QrCode::format('svg')->size(400)->margin(10)->backgroundColor(0, 0, 0, 0)->generate($qrText);
+        $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
         return [
             'nomor_surat_penerimaan' => $request->input('nomor_surat_penerimaan'),
             'nomor_surat_pengantar' => $request->input('nomor_surat_pengantar'),
-            'tanggal_surat_pengantar' => $request->input('tanggal_surat_pengantar'),
+            'tanggal_surat_pengantar' => \Carbon\Carbon::parse($request->input('tanggal_surat_pengantar'))->locale('id')->isoFormat('D MMMM Y'),
             'tujuan_surat' => $request->input('tujuan_surat'),
-            'tanggal_surat' => now()->format('d F Y'),
+            'tanggal_surat' => now()->locale('id')->isoFormat('D MMMM Y'),
             'asal_surat' => $user->university,
             'divisi_mengeluarkan_surat' => $divisi->name,
             'nama_peserta' => $user->name,
             'nim' => $user->nim,
             'jurusan' => $user->major,
-            'jabatan' => $divisi->pic_name ? 'PIC Divisi' : '',
-            'nama_pic' => $divisi->pic_name,
+            'jabatan' => $divisi->vp ? 'VP ' . str_replace('Divisi ', '', $divisi->name) : '',
+            'nama_pic' => $divisi->vp,
             'nippos' => $divisi->nippos,
+            'start_date' => \Carbon\Carbon::parse($application->start_date)->locale('id')->isoFormat('D MMMM Y'),
+            'end_date' => \Carbon\Carbon::parse($application->end_date)->locale('id')->isoFormat('D MMMM Y'),
+            'ktm' => $user->ktm,
+            'qr_base64' => $qrBase64,
         ];
     }
 
     private function getCertificateData(Request $request, $user, $application)
     {
+        // Generate QR Code for certificate
+        $qrData = json_encode([
+            'type' => 'certificate_data',
+            'nama' => $user->name,
+            'nim' => $user->nim,
+            'universitas' => $user->university,
+            'jurusan' => $user->major,
+            'divisi' => $user->divisi ? $user->divisi->name : '',
+            'tanggal_mulai' => $application->start_date,
+            'tanggal_selesai' => $application->end_date,
+            'predikat' => $request->input('predikat'),
+            'ktm' => $user->ktm,
+        ]);
+        
+        // Format data dengan prefix yang menghindari interpretasi sebagai nomor telepon
+        $qrText = "SERTIFIKAT MAGANG PT POS INDONESIA\n\nNama: " . $user->name . "\nID Mahasiswa: " . $user->nim . "\nUniversitas: " . $user->university . "\nDivisi: " . ($user->divisi ? $user->divisi->name : '') . "\nPredikat: " . $request->input('predikat') . "\n\nSertifikat ini valid dan dapat diverifikasi.";
+        $qrSvg = QrCode::format('svg')->size(400)->margin(10)->backgroundColor(0, 0, 0, 0)->generate($qrText);
+        $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
+        
         return [
             'nomor_sertifikat' => $request->input('nomor_sertifikat'),
             'predikat' => $request->input('predikat'),
@@ -359,12 +400,13 @@ class MentorDashboardController extends Controller
             'universitas' => $user->university,
             'jurusan' => $user->major,
             'nim' => $user->nim,
-            'start_date' => $application->start_date,
-            'end_date' => $application->end_date,
-            'nama_pic' => $user->divisi ? $user->divisi->pic_name : '',
+            'start_date' => \Carbon\Carbon::parse($application->start_date)->locale('id')->isoFormat('D MMMM Y'),
+            'end_date' => \Carbon\Carbon::parse($application->end_date)->locale('id')->isoFormat('D MMMM Y'),
+            'nama_pic' => $user->divisi ? $user->divisi->vp : '',
             'nippos' => $user->divisi ? $user->divisi->nippos : '',
-            'jabatan' => $user->divisi ? 'PIC Divisi' : '',
-            'tanggal_sertifikat' => now()->format('d F Y'),
+            'jabatan' => $user->divisi ? 'VP ' . str_replace('Divisi ', '', $user->divisi->name) : '',
+            'tanggal_sertifikat' => now()->locale('id')->isoFormat('D MMMM Y'),
+            'qr_base64' => $qrBase64,
         ];
     }
 } 

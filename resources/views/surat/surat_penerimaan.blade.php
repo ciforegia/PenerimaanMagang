@@ -90,9 +90,11 @@
     <div style="margin-bottom: 16px; text-align: justify;">
         Untuk selanjutnya, apabila yang bersangkutan sudah selesai melaksanakan kerja praktik diharuskan melapor kepada kami untuk dibuatkan surat keterangan selesai dan sertifikat. Demikian kami sampaikan, atas perhatian dan kerja samanya kami ucapkan terima kasih.
     </div>
-    <div style="width: 100px; margin-left: auto; margin-right: 60px; margin-top: 40px; text-align: left;">
+    <div style="width: 600px; margin-left: auto; margin-right: 40px; margin-top: 20px; text-align: left;">
         Hormat kami,<br>
-        {{ $jabatan }}<br><br><br><br>
+        {{ $jabatan }}<br>
+                        <img src="{{ $qr_base64 }}" alt="QR Code" width="120" height="120" />
+        <br>
         <b>{{ $nama_pic }}</b><br>
         {{ $nippos }}
     </div>

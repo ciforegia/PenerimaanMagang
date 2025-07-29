@@ -47,8 +47,8 @@
                         <th>Universitas/Sekolah</th>
                         <th>Jurusan</th>
                         <th>NIM</th>
-                        <th>Tanggal Mulai</th>
-                        <th>Tanggal Berakhir</th>
+                        <th style="min-width: 130px;">Tanggal Mulai</th>
+                        <th style="min-width: 150px;">Tanggal Berakhir</th>
                         <th>Divisi</th>
                         <th>Sub Direktorat</th>
                         <th>Direktorat</th>

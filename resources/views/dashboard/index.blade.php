@@ -149,7 +149,7 @@
                             <p class="mb-1"><strong>Divisi:</strong> {{ $application->divisi->name }}</p>
                             <p class="mb-1"><strong>Sub Direktorat:</strong> {{ $application->divisi->subDirektorat->name }}</p>
                             <p class="mb-1"><strong>Direktorat:</strong> {{ $application->divisi->subDirektorat->direktorat->name }}</p>
-                            <p class="mb-1"><strong>PIC:</strong> {{ $application->divisi->pic_name }}</p>
+                            <p class="mb-1"><strong>PIC:</strong> {{ $application->divisi->vp }}</p>
                         </div>
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Status:</strong> 

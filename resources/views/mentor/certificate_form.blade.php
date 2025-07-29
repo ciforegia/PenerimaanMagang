@@ -17,7 +17,7 @@
                         <strong>Jurusan:</strong> {{ $user->major }}<br>
                         <strong>Universitas/Sekolah:</strong> {{ $user->university }}<br>
                         <strong>Divisi:</strong> {{ $user->divisi->name ?? '-' }}<br>
-                        <strong>PIC Divisi:</strong> {{ $user->divisi->pic_name ?? '-' }}<br>
+                        <strong>PIC Divisi:</strong> {{ $user->divisi->vp ?? '-' }}<br>
                         <strong>NIPPOS:</strong> {{ $user->divisi->nippos ?? '-' }}<br>
                         <strong>Periode:</strong> {{ $application->start_date }} s/d {{ $application->end_date }}<br>
                     </div>

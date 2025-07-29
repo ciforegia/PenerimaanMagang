@@ -31,7 +31,8 @@ class AdminController extends Controller
         $divisions = Divisi::withCount(['internshipApplications' => function($q) {
             $q->whereIn('status', ['accepted', 'finished']);
         }])->get();
-        return view('admin.dashboard', compact('totalParticipants', 'totalApplications', 'totalFinishedParticipants', 'recentApplications', 'divisions'));
+        $rule = \App\Models\Rule::first();
+        return view('admin.dashboard', compact('totalParticipants', 'totalApplications', 'totalFinishedParticipants', 'recentApplications', 'divisions', 'rule'));
     }
 
     public function applications()
@@ -162,8 +163,8 @@ class AdminController extends Controller
                 'universitas' => $user->university ?? '-',
                 'jurusan' => $user->major ?? '-',
                 'nim' => $user->nim ?? '-',
-                'tanggal_mulai' => $app->start_date ?? '-',
-                'tanggal_berakhir' => $app->end_date ?? '-',
+                'tanggal_mulai' => $app->start_date ? \Carbon\Carbon::parse($app->start_date)->format('d-m-Y') : '-',
+                'tanggal_berakhir' => $app->end_date ? \Carbon\Carbon::parse($app->end_date)->format('d-m-Y') : '-',
                 'divisi' => $app->divisi->name ?? '-',
                 'subdirektorat' => $app->divisi->subDirektorat->name ?? '-',
                 'direktorat' => $app->divisi->subDirektorat->direktorat->name ?? '-',
@@ -266,6 +267,24 @@ class AdminController extends Controller
         return \Maatwebsite\Excel\Facades\Excel::download($export, 'report_peserta_magang.xlsx');
     }
 
+    public function editRules()
+    {
+        $rule = \App\Models\Rule::first();
+        return view('admin.rules', compact('rule'));
+    }
+
+    public function updateRules(Request $request)
+    {
+        $request->validate(['content' => 'required']);
+        $rule = \App\Models\Rule::first();
+        if (!$rule) {
+            $rule = \App\Models\Rule::create(['content' => $request->content]);
+        } else {
+            $rule->update(['content' => $request->content]);
+        }
+        return redirect()->route('admin.dashboard')->with('success', 'Peraturan berhasil diperbarui!');
+    }
+
     // Direktorat CRUD Methods
     public function storeDirektorat(Request $request)
     {
@@ -362,7 +381,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'sub_direktorat_id' => 'required|exists:sub_direktorats,id',
-            'pic_name' => 'required|string|max:255',
+            'vp' => 'required|string|max:255',
             'nippos' => 'required|string|max:255'
         ]);
 
@@ -370,7 +389,7 @@ class AdminController extends Controller
         $divisi = Divisi::create([
             'name' => $request->name,
             'sub_direktorat_id' => $request->sub_direktorat_id,
-            'pic_name' => $request->pic_name,
+            'vp' => $request->vp,
             'nippos' => $request->nippos
         ]);
 
@@ -389,7 +408,7 @@ class AdminController extends Controller
 
         User::create([
             'username' => $username,
-            'name' => $request->pic_name,
+            'name' => $request->vp,
             'email' => $email,
             'password' => bcrypt('mentor123'),
             'role' => 'pembimbing',
@@ -404,29 +423,29 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'sub_direktorat_id' => 'required|exists:sub_direktorats,id',
-            'pic_name' => 'required|string|max:255',
+            'vp' => 'required|string|max:255',
             'nippos' => 'required|string|max:255'
         ]);
 
         $divisi = Divisi::findOrFail($id);
-        $oldPicName = $divisi->pic_name;
+        $oldVpName = $divisi->vp;
         
         $divisi->update([
             'name' => $request->name,
             'sub_direktorat_id' => $request->sub_direktorat_id,
-            'pic_name' => $request->pic_name,
+            'vp' => $request->vp,
             'nippos' => $request->nippos
         ]);
 
-        // Update pembimbing user if PIC name changed
-        if ($oldPicName !== $request->pic_name) {
+        // Update pembimbing user if VP name changed
+        if ($oldVpName !== $request->vp) {
             $pembimbing = User::where('divisi_id', $divisi->id)
                              ->where('role', 'pembimbing')
                              ->first();
             
             if ($pembimbing) {
                 $pembimbing->update([
-                    'name' => $request->pic_name
+                    'name' => $request->vp
                 ]);
             }
         }

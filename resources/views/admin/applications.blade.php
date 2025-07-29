@@ -42,7 +42,7 @@
                             <td><span class="badge bg-secondary">Pending</span></td>
                         </tr>
                         @empty
-                        <tr><td colspan="7" class="text-center">Tidak ada pengajuan pending.</td></tr>
+                        <tr><td colspan="10" class="text-center">Tidak ada pengajuan pending.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

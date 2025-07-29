@@ -91,7 +91,7 @@
                                                     @foreach($sub->divisis as $divisi)
                                                     <tr>
                                                         <td>{{ $divisi->name }}</td>
-                                                        <td>{{ $divisi->pic_name }}</td>
+                                                        <td>{{ $divisi->vp }}</td>
                                                         <td>{{ $divisi->nippos }}</td>
                                                         <td>
                                                             @php
@@ -292,9 +292,9 @@
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="pic_name_div{{ $sub->id }}" class="form-label">Nama PIC</label>
-                                <input type="text" class="form-control @error('pic_name') is-invalid @enderror" id="pic_name_div{{ $sub->id }}" name="pic_name" value="{{ old('pic_name') }}" required>
-                                @error('pic_name')
+                                                        <label for="vp_div{{ $sub->id }}" class="form-label">Nama VP</label>
+                        <input type="text" class="form-control @error('vp') is-invalid @enderror" id="vp_div{{ $sub->id }}" name="vp" value="{{ old('vp') }}" required>
+                        @error('vp')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -360,9 +360,9 @@
                                     @enderror
                                 </div>
                                 <div class="mb-3">
-                                    <label for="pic_name{{ $divisi->id }}" class="form-label">Nama PIC</label>
-                                    <input type="text" class="form-control @error('pic_name') is-invalid @enderror" id="pic_name{{ $divisi->id }}" name="pic_name" value="{{ old('pic_name', $divisi->pic_name) }}" required>
-                                    @error('pic_name')
+                                                            <label for="vp{{ $divisi->id }}" class="form-label">Nama VP</label>
+                        <input type="text" class="form-control @error('vp') is-invalid @enderror" id="vp{{ $divisi->id }}" name="vp" value="{{ old('vp', $divisi->vp) }}" required>
+                        @error('vp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -400,9 +400,9 @@
                                 <strong>Info:</strong> Nama user pembimbing akan diperbarui otomatis sesuai dengan nama PIC yang baru
                             </div>
                                 <div class="mb-3">
-                                    <label for="pic_name_pic{{ $divisi->id }}" class="form-label">Nama PIC</label>
-                                    <input type="text" class="form-control @error('pic_name') is-invalid @enderror" id="pic_name_pic{{ $divisi->id }}" name="pic_name" value="{{ old('pic_name', $divisi->pic_name) }}" required>
-                                    @error('pic_name')
+                                                            <label for="vp_pic{{ $divisi->id }}" class="form-label">Nama VP</label>
+                        <input type="text" class="form-control @error('vp') is-invalid @enderror" id="vp_pic{{ $divisi->id }}" name="vp" value="{{ old('vp', $divisi->vp) }}" required>
+                        @error('vp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

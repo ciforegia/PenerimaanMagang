@@ -84,29 +84,28 @@
             font-family: 'Sora', Arial, sans-serif;
             font-size: 28px;
             color: #152d5d;
-            margin-top: 40px;
+            margin-top: 20px;
             margin-left: 134px;
         }
         .footer .jabatan{
             font-family: 'Sora', Arial, sans-serif;
             font-size: 28px;
             color: #152d5d;
-            margin-top: 40px;
-            margin-left: 88px;
+            margin-top: 20px;
         }
         .ttd {
-            margin-top: 60px;
+            margin-top: 5px;
             font-family: 'Sora', Arial, sans-serif;
             font-size: 28px;
             color: #152d5d;
-            margin-left: 155px;
+            margin-left: 134px;
         }
         .ttd .nama {
             font-family: 'Sora', Arial, sans-serif;
             font-size: 28px;
             font-weight: bold;
-            margin-top: 150px;
-            margin-left: 45px;
+            margin-top: 0px;
+            margin-left: 0px;
         }
     </style>
 </head>
@@ -124,6 +123,7 @@
         <div class="footer">
             Bandung, {{ $tanggal_sertifikat }}
             <div class="jabatan">{{ $jabatan }}</div>
+            <img src="{{ $qr_base64 }}" alt="QR Code" width="250" height="250" style="margin-top: 5px;" />
         </div>
         <div class="ttd">
             <div class="nama">{{ $nama_pic }}</div>

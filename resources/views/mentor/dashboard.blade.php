@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-0">Dashboard Pembimbing Lapangan</h1>
-            <p class="text-muted">Welcome, {{ Auth::user()->divisi && Auth::user()->divisi->pic_name ? Auth::user()->divisi->pic_name : Auth::user()->name }}!</p>
+            <p class="text-muted">Welcome, {{ Auth::user()->divisi && Auth::user()->divisi->vp ? Auth::user()->divisi->vp : Auth::user()->name }}!</p>
             <p class="text-muted">{{ Auth::user()->divisi ? Auth::user()->divisi->name : '-' }}</p>
         </div>
     </div>

@@ -47,7 +47,7 @@
                 </div>
                 <div class="mb-4">
                     <h6 class="text-muted mb-2">Welcome</h6>
-                    <p class="mb-0 fw-bold">{{ Auth::user()->divisi && Auth::user()->divisi->pic_name ? Auth::user()->divisi->pic_name : Auth::user()->name }}</p>
+                    <p class="mb-0 fw-bold">{{ Auth::user()->divisi && Auth::user()->divisi->vp ? Auth::user()->divisi->vp : Auth::user()->name }}</p>
                 </div>
                 <hr class="my-3">
                 <nav class="nav flex-column">
@@ -84,7 +84,7 @@
                         <div class="navbar-nav ms-auto">
                             <div class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user me-1"></i>{{ Auth::user()->divisi && Auth::user()->divisi->pic_name ? Auth::user()->divisi->pic_name : Auth::user()->name }}
+                                    <i class="fas fa-user me-1"></i>{{ Auth::user()->divisi && Auth::user()->divisi->vp ? Auth::user()->divisi->vp : Auth::user()->name }}
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="{{ route('mentor.profil') }}">Profil</a></li>
