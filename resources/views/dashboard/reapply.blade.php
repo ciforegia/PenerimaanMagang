@@ -40,7 +40,7 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('dashboard.submit-reapply') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('dashboard.submit-reapply') }}">
                         @csrf
 
                         <div class="mb-3">
@@ -62,11 +62,21 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="cover_letter" class="form-label">Surat Pengantar Kampus <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control @error('cover_letter') is-invalid @enderror" 
-                                   id="cover_letter" name="cover_letter" accept=".pdf" required>
-                            <div class="form-text">Format yang diterima: PDF (Maksimal 2MB)</div>
-                            @error('cover_letter')
+                            <label for="start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control @error('start_date') is-invalid @enderror" 
+                                   id="start_date" name="start_date" required>
+                            @error('start_date')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">End Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control @error('end_date') is-invalid @enderror" 
+                                   id="end_date" name="end_date" required>
+                            @error('end_date')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -133,6 +143,32 @@ document.addEventListener('DOMContentLoaded', function() {
         if (divisiSelect) {
             divisiSelect.value = divisiId;
         }
+    }
+
+    // Client-side validation for dates
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    
+    if (startDateInput && endDateInput) {
+        // Set minimum date for start_date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        startDateInput.min = tomorrow.toISOString().split('T')[0];
+        
+        // Update end_date minimum when start_date changes
+        startDateInput.addEventListener('change', function() {
+            if (this.value) {
+                const startDate = new Date(this.value);
+                const nextDay = new Date(startDate);
+                nextDay.setDate(nextDay.getDate() + 1);
+                endDateInput.min = nextDay.toISOString().split('T')[0];
+                
+                // If end_date is before start_date, clear it
+                if (endDateInput.value && endDateInput.value <= this.value) {
+                    endDateInput.value = '';
+                }
+            }
+        });
     }
 });
 </script>

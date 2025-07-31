@@ -81,9 +81,9 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Divisi</th>
-                                                        <th>PIC</th>
+                                                        <th>VP</th>
                                                         <th>NIPPOS</th>
-                                                        <th>Username Pembimbing</th>
+                                                        <th>Akun Pembimbing</th>
                                                         <th>Aksi</th>
                                                     </tr>
                                                 </thead>
@@ -113,8 +113,6 @@
                                                         </td>
                                                         <td>
                                                             <button class="btn btn-sm btn-warning me-2" data-bs-toggle="modal" data-bs-target="#editDivisiModal{{ $divisi->id }}">Edit</button>
-
-                                                            <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#editPICModal{{ $divisi->id }}">Ubah PIC</button>
                                                             <button class="btn btn-sm btn-danger" onclick="confirmDelete('Divisi', '{{ $divisi->name }}', '{{ route('admin.divisi.delete', $divisi->id) }}')">Hapus</button>
                                                         </td>
                                                     </tr>
@@ -236,6 +234,10 @@
                         @csrf
                         @method('PUT')
                         <div class="modal-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Info:</strong> Anda hanya dapat mengedit nama subdirektorat.
+                            </div>
                             <div class="mb-3">
                                 <label for="name{{ $sub->id }}" class="form-label">Nama Subdirektorat</label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" id="name{{ $sub->id }}" name="name" value="{{ old('name', $sub->name) }}" required>
@@ -243,19 +245,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="mb-3">
-                                <label for="direktorat_id{{ $sub->id }}" class="form-label">Direktorat</label>
-                                <select class="form-control @error('direktorat_id') is-invalid @enderror" id="direktorat_id{{ $sub->id }}" name="direktorat_id" required>
-                                    @foreach($direktorats as $dir)
-                                        <option value="{{ $dir->id }}" {{ old('direktorat_id', $sub->direktorat_id) == $dir->id ? 'selected' : '' }}>
-                                            {{ $dir->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('direktorat_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                            <input type="hidden" name="direktorat_id" value="{{ $sub->direktorat_id }}">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -335,7 +325,7 @@
                         <div class="modal-body">
                             <div class="alert alert-info">
                                 <i class="fas fa-info-circle me-2"></i>
-                                <strong>Info:</strong> Jika nama PIC diubah, nama user pembimbing juga akan diperbarui otomatis
+                                <strong>Info:</strong> Anda hanya dapat mengedit informasi divisi.
                             </div>
                                 <div class="mb-3">
                                     <label for="name{{ $divisi->id }}" class="form-label">Nama Divisi</label>
@@ -345,24 +335,9 @@
                                     @enderror
                                 </div>
                                 <div class="mb-3">
-                                    <label for="sub_direktorat_id{{ $divisi->id }}" class="form-label">Subdirektorat</label>
-                                    <select class="form-control @error('sub_direktorat_id') is-invalid @enderror" id="sub_direktorat_id{{ $divisi->id }}" name="sub_direktorat_id" required>
-                                        @foreach($direktorats as $dir)
-                                            @foreach($dir->subDirektorats as $subDir)
-                                                <option value="{{ $subDir->id }}" {{ old('sub_direktorat_id', $divisi->sub_direktorat_id) == $subDir->id ? 'selected' : '' }}>
-                                                    {{ $dir->name }} - {{ $subDir->name }}
-                                                </option>
-                                            @endforeach
-                                        @endforeach
-                                    </select>
-                                    @error('sub_direktorat_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="mb-3">
-                                                            <label for="vp{{ $divisi->id }}" class="form-label">Nama VP</label>
-                        <input type="text" class="form-control @error('vp') is-invalid @enderror" id="vp{{ $divisi->id }}" name="vp" value="{{ old('vp', $divisi->vp) }}" required>
-                        @error('vp')
+                                    <label for="vp{{ $divisi->id }}" class="form-label">Nama VP</label>
+                                    <input type="text" class="form-control @error('vp') is-invalid @enderror" id="vp{{ $divisi->id }}" name="vp" value="{{ old('vp', $divisi->vp) }}" required>
+                                    @error('vp')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -373,47 +348,6 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-primary">Update</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Modal Edit PIC --}}
-            <div class="modal fade" id="editPICModal{{ $divisi->id }}" tabindex="-1" aria-labelledby="editPICModalLabel{{ $divisi->id }}" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editPICModalLabel{{ $divisi->id }}">Ubah PIC Divisi</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                    <form action="{{ route('admin.divisi.update', $divisi->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-body">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>Info:</strong> Nama user pembimbing akan diperbarui otomatis sesuai dengan nama PIC yang baru
-                            </div>
-                                <div class="mb-3">
-                                                            <label for="vp_pic{{ $divisi->id }}" class="form-label">Nama VP</label>
-                        <input type="text" class="form-control @error('vp') is-invalid @enderror" id="vp_pic{{ $divisi->id }}" name="vp" value="{{ old('vp', $divisi->vp) }}" required>
-                        @error('vp')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="mb-3">
-                                    <label for="nippos_pic{{ $divisi->id }}" class="form-label">NIPPOS</label>
-                                    <input type="text" class="form-control @error('nippos') is-invalid @enderror" id="nippos_pic{{ $divisi->id }}" name="nippos" value="{{ old('nippos', $divisi->nippos) }}" required>
-                                    @error('nippos')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <input type="hidden" name="name" value="{{ $divisi->name }}">
                                 <input type="hidden" name="sub_direktorat_id" value="{{ $divisi->sub_direktorat_id }}">
                             </div>
                             <div class="modal-footer">
@@ -424,6 +358,8 @@
                     </div>
                 </div>
             </div>
+
+
             @endforeach
         @endforeach
     @endforeach

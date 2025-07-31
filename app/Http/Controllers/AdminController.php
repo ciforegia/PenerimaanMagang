@@ -352,9 +352,11 @@ class AdminController extends Controller
         ]);
 
         $subdirektorat = SubDirektorat::findOrFail($id);
+        
+        // Only update the name, keep the original direktorat_id
         $subdirektorat->update([
-            'name' => $request->name,
-            'direktorat_id' => $request->direktorat_id
+            'name' => $request->name
+            // direktorat_id is kept unchanged for security
         ]);
 
         return redirect()->route('admin.divisions')->with('success', 'Subdirektorat "' . $request->name . '" berhasil diperbarui');
@@ -429,24 +431,50 @@ class AdminController extends Controller
 
         $divisi = Divisi::findOrFail($id);
         $oldVpName = $divisi->vp;
+        $oldDivisiName = $divisi->name;
         
+        // Only update divisi-specific fields, keep sub_direktorat_id unchanged
         $divisi->update([
             'name' => $request->name,
-            'sub_direktorat_id' => $request->sub_direktorat_id,
             'vp' => $request->vp,
             'nippos' => $request->nippos
+            // sub_direktorat_id is kept unchanged for security
         ]);
 
-        // Update pembimbing user if VP name changed
-        if ($oldVpName !== $request->vp) {
-            $pembimbing = User::where('divisi_id', $divisi->id)
-                             ->where('role', 'pembimbing')
-                             ->first();
+        // Get pembimbing user for this divisi
+        $pembimbing = User::where('divisi_id', $divisi->id)
+                         ->where('role', 'pembimbing')
+                         ->first();
+        
+        if ($pembimbing) {
+            $updateData = [];
             
-            if ($pembimbing) {
-                $pembimbing->update([
-                    'name' => $request->vp
-                ]);
+            // Update VP name if changed
+            if ($oldVpName !== $request->vp) {
+                $updateData['name'] = $request->vp;
+            }
+            
+            // Update username if divisi name changed
+            if ($oldDivisiName !== $request->name) {
+                $newUsername = 'mentor_' . strtolower(str_replace(' ', '_', $request->name));
+                $newEmail = $newUsername . '@posindonesia.co.id';
+                
+                // Check if new username already exists, if so, add number
+                $originalUsername = $newUsername;
+                $counter = 1;
+                while (User::where('username', $newUsername)->where('id', '!=', $pembimbing->id)->exists()) {
+                    $newUsername = $originalUsername . '_' . $counter;
+                    $newEmail = $newUsername . '@posindonesia.co.id';
+                    $counter++;
+                }
+                
+                $updateData['username'] = $newUsername;
+                $updateData['email'] = $newEmail;
+            }
+            
+            // Update pembimbing if there are changes
+            if (!empty($updateData)) {
+                $pembimbing->update($updateData);
             }
         }
 

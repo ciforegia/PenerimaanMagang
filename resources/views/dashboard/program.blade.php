@@ -71,9 +71,19 @@
                                                     </div>
                                                     <div class="mt-3">
                                                         @if(!$hasAccepted)
-                                                            <a href="{{ route('internship.apply', ['divisi' => $divisi->id]) }}" class="btn btn-primary btn-sm">
-                                                                <i class="fas fa-paper-plane me-1"></i>Ajukan Permintaan Magang
-                                                            </a>
+                                                            @php
+                                                                $hasRejectedApplication = $user->internshipApplications()->where('status', 'rejected')->exists();
+                                                            @endphp
+                                                            
+                                                            @if($hasRejectedApplication)
+                                                                <a href="{{ route('dashboard.reapply') }}?divisi={{ $divisi->id }}" class="btn btn-warning btn-sm">
+                                                                    <i class="fas fa-redo me-1"></i>Ajukan Ulang Magang
+                                                                </a>
+                                                            @else
+                                                                <a href="{{ route('internship.apply', ['divisi' => $divisi->id]) }}" class="btn btn-primary btn-sm">
+                                                                    <i class="fas fa-paper-plane me-1"></i>Ajukan Permintaan Magang
+                                                                </a>
+                                                            @endif
                                                         @endif
                                                     </div>
                                                 </div>

@@ -208,22 +208,22 @@ class DashboardController extends Controller
     {
         $request->validate([
             'divisi_id' => 'required|exists:divisis,id',
-            'cover_letter' => 'required|file|mimes:pdf|max:2048',
+            'start_date' => 'required|date|after:today',
+            'end_date' => 'required|date|after:start_date',
+        ], [
+            'start_date.after' => 'Tanggal mulai harus setelah hari ini.',
+            'end_date.after' => 'Tanggal selesai harus setelah tanggal mulai.',
         ]);
 
         $user = Auth::user();
-
-        // Handle file upload
-        if ($request->hasFile('cover_letter')) {
-            $path = $request->file('cover_letter')->store('cover_letters', 'public');
-        }
 
         // Create new internship application
         InternshipApplication::create([
             'user_id' => $user->id,
             'divisi_id' => $request->divisi_id,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
             'status' => 'pending',
-            'cover_letter_path' => $path ?? null,
         ]);
 
         return redirect('/dashboard')->with('success', 'Pengajuan ulang berhasil dikirim! Status akan diperbarui segera.');

@@ -145,9 +145,20 @@ use Carbon\Carbon;
                                             </td>
                                             <td class="align-middle text-center">
                                                 @if($participant->user->certificates->count() > 0)
-                                                    <i class="fas fa-check text-success" title="Ada sertifikat"></i>
+                                                    @php
+                                                        $certificate = $participant->user->certificates->first();
+                                                    @endphp
+                                                    <div class="d-flex flex-column gap-1">
+                                                        <a href="{{ asset('storage/' . $certificate->certificate_path) }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                                            <i class="fas fa-certificate me-1"></i>Lihat Sertifikat
+                                                        </a>
+                                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#certificateModal{{ $certificate->id }}">
+                                                            <i class="fas fa-info-circle me-1"></i>Detail
+                                                        </button>
+                                                        <small class="text-muted">{{ Carbon::parse($certificate->created_at)->format('d/m/Y') }}</small>
+                                                    </div>
                                                 @else
-                                                    <i class="fas fa-times text-danger" title="Tidak ada sertifikat"></i>
+                                                    <span class="text-muted">-</span>
                                                 @endif
                                             </td>
                                             @if($participantIndex == 0)
@@ -243,7 +254,7 @@ use Carbon\Carbon;
                                 </div>
                                 <div class="col-md-6">
                                     <ul class="list-unstyled">
-                                        <li><i class="fas fa-check text-success me-2"></i>Ada sertifikat</li>
+                                        <li><i class="fas fa-certificate text-success me-2"></i>Lihat sertifikat peserta</li>
                                         <li><i class="fas fa-times text-danger me-2"></i>Tidak ada sertifikat</li>
                                         <li><i class="fas fa-times text-danger me-2"></i>Tidak ada tugas</li>
                                     </ul>
@@ -284,6 +295,107 @@ use Carbon\Carbon;
         </div>
     </div>
 </div>
+@endforeach
+
+<!-- Certificate Detail Modals -->
+@foreach($mentors as $mentor)
+    @php
+        $divisi = $mentor->divisi;
+        $participants = $divisi ? $divisi->internshipApplications->whereIn('status', ['accepted', 'finished']) : collect();
+    @endphp
+    @foreach($participants as $participant)
+        @if($participant->user->certificates->count() > 0)
+            @php
+                $certificate = $participant->user->certificates->first();
+            @endphp
+            <div class="modal fade" id="certificateModal{{ $certificate->id }}" tabindex="-1" aria-labelledby="certificateModalLabel{{ $certificate->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="certificateModalLabel{{ $certificate->id }}">
+                                <i class="fas fa-certificate me-2"></i>Detail Sertifikat
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-primary mb-3">Informasi Peserta</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Nama:</strong></td>
+                                            <td>{{ $participant->user->name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>NIM:</strong></td>
+                                            <td>{{ $participant->user->nim ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Universitas:</strong></td>
+                                            <td>{{ $participant->user->university ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Divisi:</strong></td>
+                                            <td>{{ $participant->divisi->name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Pembimbing:</strong></td>
+                                            <td>{{ $mentor->divisi->vp ?? '-' }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-primary mb-3">Informasi Sertifikat</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Nomor Sertifikat:</strong></td>
+                                            <td>{{ $certificate->nomor_sertifikat ?? '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Predikat:</strong></td>
+                                            <td>
+                                                @if($certificate->predikat)
+                                                    <span class="badge bg-success">{{ $certificate->predikat }}</span>
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Tanggal Terbit:</strong></td>
+                                            <td>{{ $certificate->issued_at ? Carbon::parse($certificate->issued_at)->format('d/m/Y') : '-' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Tanggal Upload:</strong></td>
+                                            <td>{{ Carbon::parse($certificate->created_at)->format('d/m/Y H:i') }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <h6 class="text-primary mb-3">Preview Sertifikat</h6>
+                                    <div class="text-center">
+                                        @if(pathinfo($certificate->certificate_path, PATHINFO_EXTENSION) === 'pdf')
+                                            <iframe src="{{ asset('storage/' . $certificate->certificate_path) }}" width="100%" height="400" frameborder="0"></iframe>
+                                        @else
+                                            <img src="{{ asset('storage/' . $certificate->certificate_path) }}" class="img-fluid" alt="Sertifikat" style="max-height: 400px;">
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="{{ asset('storage/' . $certificate->certificate_path) }}" target="_blank" class="btn btn-success">
+                                <i class="fas fa-download me-1"></i>Download Sertifikat
+                            </a>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
 @endforeach
 
 @if(session('success'))
