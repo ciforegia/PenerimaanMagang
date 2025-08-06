@@ -162,6 +162,14 @@ class MentorDashboardController extends Controller
             'file_path' => 'nullable|file|mimes:pdf,doc,docx,zip|max:4096',
             'online_text' => 'nullable|string',
         ]);
+        // Cek apakah peserta sudah mulai magang
+        $application = \App\Models\InternshipApplication::where('user_id', $request->user_id)
+            ->where('status', 'accepted')
+            ->latest('start_date')
+            ->first();
+        if (!$application || ($application->start_date && \Carbon\Carbon::parse($application->start_date)->gt(now()))) {
+            return redirect()->back()->with('error', 'Penugasan hanya dapat diberikan setelah peserta mulai periode magang.');
+        }
         $data = [
             'user_id' => $request->user_id,
             'title' => $request->title,

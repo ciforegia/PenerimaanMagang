@@ -96,6 +96,9 @@
                                     <h6 class="text-info mb-2">
                                         <i class="fas fa-upload me-2"></i>Upload Dokumen Tambahan
                                     </h6>
+                                    <p class="text-danger mb-2" style="font-size: 0.95em;">
+                                        Maksimal ukuran file yang dapat diupload adalah <b>2 MB</b> untuk setiap dokumen.
+                                    </p>
                                     <form method="POST" action="{{ route('dashboard.status.upload-additional') }}" enctype="multipart/form-data">
                                         @csrf
                                         <div class="mb-2">

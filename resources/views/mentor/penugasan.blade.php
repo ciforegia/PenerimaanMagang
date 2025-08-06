@@ -86,11 +86,17 @@
                     <hr>
                     <!-- Form Penilaian di bawah tabel, kanan bawah -->
                     <div class="d-flex justify-content-between align-items-start mt-3">
-                        <div>
-                            <button class="btn btn-primary mb-3" type="button" id="toggleCreateTaskBtn{{ $participant->user->id }}">
-                                <i class="fas fa-plus me-1"></i>Buat Tugas Baru
-                            </button>
-                        </div>
+                        @if($participant->start_date && \Carbon\Carbon::parse($participant->start_date)->gt(now()))
+                            <div class="alert alert-warning mt-3 mb-0">
+                                Penugasan hanya dapat diberikan setelah peserta mulai periode magang ({{ \Carbon\Carbon::parse($participant->start_date)->format('d-m-Y') }}).
+                            </div>
+                        @else
+                            <div>
+                                <button class="btn btn-primary mb-3" type="button" id="toggleCreateTaskBtn{{ $participant->user->id }}">
+                                    <i class="fas fa-plus me-1"></i>Buat Tugas Baru
+                                </button>
+                            </div>
+                        @endif
                         <div class="d-flex flex-wrap gap-3">
                             @foreach($participant->user->assignments->sortBy('created_at') as $assignment)
                                 @php
