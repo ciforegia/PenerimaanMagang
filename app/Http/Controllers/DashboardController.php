@@ -31,7 +31,7 @@ class DashboardController extends Controller
         }
         $application = $user->internshipApplications()
             ->with('divisi.subDirektorat.direktorat')
-            ->whereIn('status', ['pending', 'accepted'])
+            ->whereIn('status', ['pending', 'accepted', 'finished'])
             ->latest()
             ->first();
         if (!$application) {
@@ -56,7 +56,7 @@ class DashboardController extends Controller
             ->update(['status' => 'finished']);
         $application = $user->internshipApplications()
             ->with('divisi.subDirektorat.direktorat')
-            ->whereIn('status', ['pending', 'accepted'])
+            ->whereIn('status', ['pending', 'accepted', 'finished'])
             ->latest()
             ->first();
         if (!$application) {
@@ -76,10 +76,10 @@ class DashboardController extends Controller
         $user = Auth::user();
         $assignments = $user->assignments()->orderBy('created_at', 'desc')->get();
         
-        // Ambil pengajuan terbaru yang statusnya pending/accepted
+        // Ambil pengajuan terbaru yang statusnya pending/accepted/finished
         $application = $user->internshipApplications()
             ->with('divisi.subDirektorat.direktorat')
-            ->whereIn('status', ['pending', 'accepted'])
+            ->whereIn('status', ['pending', 'accepted', 'finished'])
             ->latest()
             ->first();
         if (!$application) {
@@ -177,12 +177,20 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $direktorats = Direktorat::with(['subDirektorats.divisis'])->get();
+        
+        // Check if user has any accepted or finished applications
         $hasAccepted = (bool) $user->internshipApplications()
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'finished'])
             ->exists();
+            
+        // Check if user has any finished applications (completed internships)
+        $hasFinished = (bool) $user->internshipApplications()
+            ->where('status', 'finished')
+            ->exists();
+            
         $hasCertificate = (bool) $user->certificates()->exists();
         
-        return view('dashboard.program', compact('user', 'direktorats', 'hasAccepted', 'hasCertificate'));
+        return view('dashboard.program', compact('user', 'direktorats', 'hasAccepted', 'hasFinished', 'hasCertificate'));
     }
 
     /**
@@ -233,7 +241,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $application = $user->internshipApplications()
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'finished'])
             ->latest()
             ->first();
         if ($application) {
@@ -247,7 +255,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $application = $user->internshipApplications()
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'finished'])
             ->latest()
             ->first();
         if (!$application) {

@@ -17,7 +17,7 @@
         $rejectedApplication = $user->internshipApplications()->where('status', 'rejected')->latest()->first();
     @endphp
     
-    @if($rejectedApplication && !$hasAccepted)
+    @if($rejectedApplication && !$hasAccepted && !$hasFinished)
     <div class="alert alert-warning">
         <strong><i class="fas fa-exclamation-triangle me-2"></i>Pengajuan Sebelumnya Ditolak</strong>
         <br><br>
@@ -27,9 +27,16 @@
     </div>
     @endif
 
-    @if($hasAccepted)
+    @if($hasAccepted && !$hasFinished)
         <div class="alert alert-success">
             Anda sudah diterima magang di salah satu divisi. Tidak dapat mengajukan permintaan magang ke divisi lain.
+        </div>
+    @endif
+
+    @if($hasFinished)
+        <div class="alert alert-info">
+            <strong><i class="fas fa-info-circle me-2"></i>Selamat!</strong> Anda telah menyelesaikan program magang sebelumnya. 
+            Anda dapat mengajukan permintaan magang baru untuk divisi yang sama atau berbeda.
         </div>
     @endif
 
@@ -70,12 +77,12 @@
                                                         </div>
                                                     </div>
                                                     <div class="mt-3">
-                                                        @if(!$hasAccepted)
+                                                        @if(!$hasAccepted || $hasFinished)
                                                             @php
                                                                 $hasRejectedApplication = $user->internshipApplications()->where('status', 'rejected')->exists();
                                                             @endphp
                                                             
-                                                            @if($hasRejectedApplication)
+                                                            @if($hasRejectedApplication && !$hasFinished)
                                                                 <a href="{{ route('dashboard.reapply') }}?divisi={{ $divisi->id }}" class="btn btn-warning btn-sm">
                                                                     <i class="fas fa-redo me-1"></i>Ajukan Ulang Magang
                                                                 </a>

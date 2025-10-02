@@ -23,7 +23,18 @@ class InternshipController extends Controller
      */
     public function apply($divisiId)
     {
+        $user = Auth::user();
         $divisi = Divisi::with('subDirektorat.direktorat')->findOrFail($divisiId);
+        
+        // Check if user already has any applications (pending, accepted, finished, or rejected)
+        $hasAnyApplication = $user->internshipApplications()->exists();
+        
+        if ($hasAnyApplication) {
+            // User already has applications, redirect to reapply form
+            return redirect()->route('dashboard.reapply', ['divisi' => $divisiId])
+                ->with('info', 'Anda sudah pernah mengajukan magang sebelumnya. Silakan gunakan form pengajuan ulang.');
+        }
+        
         return view('internship.apply', compact('divisi'));
     }
 
@@ -32,6 +43,16 @@ class InternshipController extends Controller
      */
     public function submitApply(Request $request, $divisiId)
     {
+        $user = Auth::user();
+        
+        // Check if user already has any applications
+        $hasAnyApplication = $user->internshipApplications()->exists();
+        
+        if ($hasAnyApplication) {
+            return redirect()->route('dashboard.reapply', ['divisi' => $divisiId])
+                ->with('error', 'Anda sudah pernah mengajukan magang sebelumnya. Silakan gunakan form pengajuan ulang.');
+        }
+        
         $request->validate([
             'divisi_id' => 'required|exists:divisis,id',
             'cover_letter' => 'required|file|mimes:pdf|max:2048',
@@ -39,7 +60,6 @@ class InternshipController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $user = Auth::user();
         $divisi = Divisi::findOrFail($request->divisi_id);
 
         // Upload surat pengantar

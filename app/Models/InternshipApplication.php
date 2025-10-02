@@ -19,6 +19,11 @@ class InternshipApplication extends Model
         'end_date'
     ];
 
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
     /**
      * Get the user that owns the internship application.
      */

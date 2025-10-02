@@ -130,12 +130,13 @@
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
                                     <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                           id="password" name="password" required>
+                                    id="password" name="password" required>
                                     @error('password')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
                                     @enderror
+                                    <label for="password" class="form-label">Harus beda dengan username <span class="text-danger">*</span></label>
                                 </div>
                             </div>
                             <div class="col-md-6">

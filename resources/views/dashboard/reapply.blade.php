@@ -97,29 +97,74 @@
 
             <!-- Previous Application Info -->
             @php
-                $rejectedApplication = $user->internshipApplications()->where('status', 'rejected')->latest()->first();
+                $latestApplication = $user->internshipApplications()->latest()->first();
             @endphp
             
-            @if($rejectedApplication)
+            @if($latestApplication)
             <div class="card mt-4">
-                <div class="card-header bg-warning text-white">
+                <div class="card-header 
+                    @if($latestApplication->status == 'rejected') bg-warning text-white
+                    @elseif($latestApplication->status == 'accepted') bg-success text-white
+                    @elseif($latestApplication->status == 'finished') bg-info text-white
+                    @else bg-secondary text-white
+                    @endif">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Pengajuan Sebelumnya
+                        @if($latestApplication->status == 'rejected')
+                            <i class="fas fa-exclamation-triangle me-2"></i>Pengajuan Sebelumnya (Ditolak)
+                        @elseif($latestApplication->status == 'accepted')
+                            <i class="fas fa-check-circle me-2"></i>Pengajuan Sebelumnya (Diterima)
+                        @elseif($latestApplication->status == 'finished')
+                            <i class="fas fa-trophy me-2"></i>Pengajuan Sebelumnya (Selesai)
+                        @else
+                            <i class="fas fa-clock me-2"></i>Pengajuan Sebelumnya ({{ ucfirst($latestApplication->status) }})
+                        @endif
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <p class="mb-1"><strong>Divisi:</strong> {{ $rejectedApplication->divisi->name }}</p>
+                            <p class="mb-1"><strong>Divisi:</strong> {{ $latestApplication->divisi->name }}</p>
                             <p class="mb-1"><strong>Status:</strong> 
-                                <span class="badge bg-danger">Ditolak</span>
+                                @if($latestApplication->status == 'rejected')
+                                    <span class="badge bg-danger">Ditolak</span>
+                                @elseif($latestApplication->status == 'accepted')
+                                    <span class="badge bg-success">Diterima</span>
+                                @elseif($latestApplication->status == 'finished')
+                                    <span class="badge bg-info">Selesai</span>
+                                @else
+                                    <span class="badge bg-secondary">{{ ucfirst($latestApplication->status) }}</span>
+                                @endif
                             </p>
-                            <p class="mb-1"><strong>Tanggal Pengajuan:</strong> {{ $rejectedApplication->created_at->format('d M Y H:i') }}</p>
+                            <p class="mb-1"><strong>Tanggal Pengajuan:</strong> {{ $latestApplication->created_at->format('d M Y H:i') }}</p>
+                            @if($latestApplication->start_date && $latestApplication->end_date)
+                                <p class="mb-1"><strong>Periode Magang:</strong> 
+                                    @if(is_string($latestApplication->start_date))
+                                        {{ \Carbon\Carbon::parse($latestApplication->start_date)->format('d M Y') }}
+                                    @else
+                                        {{ $latestApplication->start_date->format('d M Y') }}
+                                    @endif
+                                     - 
+                                    @if(is_string($latestApplication->end_date))
+                                        {{ \Carbon\Carbon::parse($latestApplication->end_date)->format('d M Y') }}
+                                    @else
+                                        {{ $latestApplication->end_date->format('d M Y') }}
+                                    @endif
+                                </p>
+                            @endif
                         </div>
                         <div class="col-md-6">
-                            @if($rejectedApplication->notes)
+                            @if($latestApplication->status == 'rejected' && $latestApplication->notes)
                                 <p class="mb-1"><strong>Alasan Penolakan:</strong></p>
-                                <p class="text-muted">{{ $rejectedApplication->notes }}</p>
+                                <p class="text-muted">{{ $latestApplication->notes }}</p>
+                            @elseif($latestApplication->status == 'accepted')
+                                <p class="mb-1"><strong>Status:</strong></p>
+                                <p class="text-success">Pengajuan Anda telah diterima. Silakan selesaikan persyaratan tambahan.</p>
+                            @elseif($latestApplication->status == 'finished')
+                                <p class="mb-1"><strong>Status:</strong></p>
+                                <p class="text-info">Selamat! Anda telah menyelesaikan program magang sebelumnya.</p>
+                            @else
+                                <p class="mb-1"><strong>Status:</strong></p>
+                                <p class="text-muted">Pengajuan Anda sedang dalam proses review.</p>
                             @endif
                         </div>
                     </div>
